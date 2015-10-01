@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Kregel\\FormModel": "src/FormModel"
+            "Kregel\\FormModel\\": "src/FormModel"
         }
     },
     "minimum-stability": "stable"

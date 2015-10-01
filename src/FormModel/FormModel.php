@@ -53,7 +53,7 @@ class FormModel {
            * we will need to loop through the different relations psased through
            */
           if(isset($model->$input)){
-            $return .= $this->modelInput($model, $input, $model->$input);    
+            $return .= $this->modelInput($model, $input);    
           }elseif(!empty($relations)){
             foreach($relations as $relation){
               $old_input = null;

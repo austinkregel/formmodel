@@ -1,6 +1,8 @@
 <?php
 namespace Kregel\FormModel;
 
+use Illuminate\Database\Eloquent\Model;
+
 class FormModel {
 
 /**

@@ -21,7 +21,7 @@ class FormModelServiceProvider extends ServiceProvider {
 		//
 		$this->app->bind('formmodel', function(){
 		  return new Kregel\FormModel\FormModel;
-		})
+		});
 	}
 
 	/**

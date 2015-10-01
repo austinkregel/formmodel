@@ -1,6 +1,6 @@
 {
     "name": "kregel/formmodel",
-    "description": "",
+    "description": "A quick way to make forms for your Laravel models",
     "authors": [
         {
             "name": "Austin Kregel",

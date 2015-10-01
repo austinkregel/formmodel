@@ -29,7 +29,7 @@ class FormModel {
  */
   public function modelForm($model, $fillable, $location, $relations, $method = 'GET')
   {
-      $bootstrap = config('warden.using.bootstrap');
+      $bootstrap = config('formmodel.using.bootstrap');
       if (in_array(strtolower($method), ['get', 'post']))
         $real_method = $method;
       else
@@ -144,7 +144,7 @@ class FormModel {
           $type = 'text';
       }
       
-      if (config('warden.using.bootstrap') === true) {
+      if (config('formmodel.using.bootstrap') === true) {
           if ($type === 'select') {
               $return .= $this->bootstrapBoolInput([
                 'type' => $type,
@@ -238,7 +238,7 @@ class FormModel {
    * @return String html submit input
    */
   public function submit(){
-    if(config('warden.using.bootstrap'))
+    if(config('formmodel.using.bootstrap'))
       return $this->bootstrapInput(['type'=> 'submit', 'class' => 'btn btn-primary pull-right', 'value' => 'Submit']);
     else 
       return $this->bootstrapInput(['type'=> 'submit', 'value' => 'Submit']);

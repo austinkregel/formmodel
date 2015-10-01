@@ -2,6 +2,8 @@
 
 return [
   'using' => [
-    'csrf' => true
+    'csrf' => true,
+    'bootstrap' => true,
+    
   ]
 ];

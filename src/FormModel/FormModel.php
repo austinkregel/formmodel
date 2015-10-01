@@ -207,9 +207,10 @@ class FormModel {
     $label = !empty($options['label'])?
             '<label class="col-md-12 ">
               <div class="col-md-3 text-right control-label">'. $this->inputToRead($options['label']).'</div>':'';
+              
     return '<div class="form-group">'.
               (!empty($label)?($label):'').
-              '<div class="col-md-9">
+              '<div class="col-md-'.(!empty($label)?'9':'12').'">
                 <input'.$this->attributes($options). '>
               </div>'.
               (!empty($label)?'</label>':'')

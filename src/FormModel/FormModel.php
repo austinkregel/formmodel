@@ -30,7 +30,7 @@ class FormModel {
   public function modelForm($model, $fillable, $location, $relations, $method = 'GET')
   {
       $bootstrap = config('warden.using.bootstrap');
-      if ($method !== 'GET' | $method !== 'POST')
+      if ($method !== 'GET' & $method !== 'POST')
         $real_method = $method;
       else
         $real_method = 'POST';

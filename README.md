@@ -2,7 +2,7 @@
 This package was created to help decrease the time it takes to echo out a form relating to a given [Model](http://laravel.com/docs/master/eloquent) while still giving the developer the ultimate amount of flexibility . 
 
 # What do I need to do to make it work?
-To get it to work properly, similar to how it works in my Warden package, it's recommended to do the following
+To get it to work properly, similar to how it works in my Warden package(comming soon :) ), it's recommended to do the following
  
   1.  composer require kregel/formmodel
       or add `"kregel/formmodel":"1.*"` to your composer.json file, just be sure to use `composer update` with that statement, or if you haven't build your dependancies use `composer install` instead.

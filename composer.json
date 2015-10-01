@@ -1,0 +1,20 @@
+{
+    "name": "kregel/formmodel",
+    "description": "",
+    "authors": [
+        {
+            "name": "Austin Kregel",
+            "email": "me@austinkregel.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "5.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kregel\\FormModel": "src/FormModel"
+        }
+    },
+    "minimum-stability": "stable"
+}

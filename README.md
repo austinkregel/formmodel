@@ -42,6 +42,7 @@ To get it to work properly, similar to how it works in my Warden package(comming
                           $user->getFillable();
     ```
     *  The route you want it to go to, it's assumed that you want to have a custom route for posting, putting, deleting or getting the information. 
+    *  Put any relations the model has that you want to update as well. So if your user has a few posts, just put `post` or `posts` there, or whatever the realtion is named.
     *  This is the method type you want to use. (POST, PUT, DELETE, or GET)
   7.  Print the results!
   
@@ -55,7 +56,7 @@ public function getUser($id, FormModel $form){
                       $user->getVisible() : 
                        $user->getFillable();
                        
-    $form_info = $form->modelForm($user, $field_names, '/user/manage', [], 'PUT');
+    $form_info = $form->modelForm($user, $field_names, '/user/manage/'.$user->id, [], 'PUT');
     
     return view('view-user')
             ->with('form', $form_info);

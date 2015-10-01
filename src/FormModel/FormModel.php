@@ -30,7 +30,7 @@ class FormModel {
   public function modelForm($model, $fillable, $location, $relations, $method = 'GET')
   {
       $bootstrap = config('warden.using.bootstrap');
-      if ($method !== 'GET' & $method !== 'POST')
+      if (in_array(strtolower($method), ['get', 'post']))
         $real_method = $method;
       else
         $real_method = 'POST';
@@ -40,7 +40,7 @@ class FormModel {
       if (config('formmodel.using.csrf') === true) {
           $return .= $this->input(['type'=>'hidden','name'=>'_token', 'value'=>csrf_token()]);
       }
-      if ((stripos($method, 'get') !== false) & (stripos($method, 'post') !== false))
+      if (in_array(strtolower($method), ['get', 'post']))
           $return .= $this->input(['type'=>'hidden', 'name'=>'_method', 'value'=>$method]);
           
       /**

@@ -37,10 +37,10 @@ class FormModel {
       
       $return = '<form class="form-horizontal" action="'.$location.'" method="'.$real_method.'" enctype="multipart/form-data">';
       
-      if (config('formmodel.using.csrf') === true) {
+      if (config('formmodel.using.csrf')) {
           $return .= $this->input(['type'=>'hidden','name'=>'_token', 'value'=>csrf_token()]);
       }
-      if (!in_array(strtolower($method), ['get', 'post']))
+      if (!(in_array(strtolower($method), ['get', 'post'])))
           $return .= $this->input(['type'=>'hidden', 'name'=>'_method', 'value'=>$method]);
           
       /**
@@ -66,6 +66,10 @@ class FormModel {
                * ex. user_id exists. if it does it will replace user_ with
                * nothing so you'll be left with just id so then it will
                * get the information for that model's relation.
+               * 
+               * So the query would actually look like
+               * (going from the above example)
+               * $model->user->id
                */
               if(stripos($input, $relation)!== false){
                   $old_input = $input;
@@ -144,7 +148,7 @@ class FormModel {
           $type = 'text';
       }
       
-      if (config('formmodel.using.bootstrap') === true) {
+      if (config('formmodel.using.bootstrap')) {
           if ($type === 'select') {
               $return .= $this->bootstrapBoolInput([
                 'type' => $type,
@@ -163,21 +167,21 @@ class FormModel {
             ]);
           }
       } else { //not bootstrap
-      if ($type === 'select') {
-          $return .= $this->boolInput([
+        if ($type === 'select') {
+            $return .= $this->boolInput([
+              'type' => $type,
+              'class' => 'form-control',
+              'name' => $old_input
+            ]);;
+        } else {
+          $return .= $this->input([
             'type' => $type,
-            'class' => 'form-control',
-            'name' => $old_input
-          ]);;
-      } else {
-        $return .= $this->input([
-          'type' => $type,
-          'id' => $input,
-          'name' => $old_input,
-          'placeholder' => $this->inputToRead($old_input),
-          'label' => $this->inputToRead($old_input),
-          'value' => !empty($model->$input)?$model->$input:''
-        ]);
+            'id' => $input,
+            'name' => $old_input,
+            'placeholder' => $this->inputToRead($old_input),
+            'label' => $this->inputToRead($old_input),
+            'value' => !empty($model->$input)?$model->$input:''
+          ]);
       }
     }
     return $return;
@@ -190,7 +194,7 @@ class FormModel {
    */
   public function input($options = []){
     $label = !empty($options['label'])?'<label>'.$options['label']:'';
-    return $label.'<input'.$this->attributes($options). '>'.!empty($label)?'</label>':'';
+    return $label.'<input'.$this->attributes($options). '>'.(!empty($label)?'</label>':'');
   }
   
   public function boolSelect($options = []){

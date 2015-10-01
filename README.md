@@ -5,7 +5,7 @@ This package was created to help decrease the time it takes to echo out a form r
 To get it to work properly, similar to how it works in my Warden package(comming soon :) ), it's recommended to do the following
  
   1.  composer require kregel/formmodel
-      or add `"kregel/formmodel":"1.*"` to your composer.json file, just be sure to use `composer update` with that statement, or if you haven't build your dependancies use `composer install` instead.
+      or add `"kregel/formmodel":"dev-master"` to your composer.json file, just be sure to use `composer update` with that statement, or if you haven't build your dependancies use `composer install` instead.
       
       
   2.  Register the service provider with your `config/app.php` file

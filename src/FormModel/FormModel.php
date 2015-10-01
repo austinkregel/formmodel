@@ -40,7 +40,7 @@ class FormModel {
       if (config('formmodel.using.csrf') === true) {
           $return .= $this->input(['type'=>'hidden','name'=>'_token', 'value'=>csrf_token()]);
       }
-      if (in_array(strtolower($method), ['get', 'post']))
+      if (!in_array(strtolower($method), ['get', 'post']))
           $return .= $this->input(['type'=>'hidden', 'name'=>'_method', 'value'=>$method]);
           
       /**

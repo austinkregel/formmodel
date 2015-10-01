@@ -1,5 +1,5 @@
 <?php
-namespace Kregel\Warden;
+namespace Kregel\FormModel;
 
 class FormModel {
 

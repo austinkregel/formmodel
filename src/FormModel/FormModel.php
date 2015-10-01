@@ -239,7 +239,7 @@ class FormModel {
    */
   public function submit(){
     if(config('warden.using.bootstrap'))
-      return $this->bootstrapInput(['type'=> 'submit', 'class' => 'btn btn-primary', 'value' => 'Submit']);
+      return $this->bootstrapInput(['type'=> 'submit', 'class' => 'btn btn-primary pull-right', 'value' => 'Submit']);
     else 
       return $this->bootstrapInput(['type'=> 'submit', 'value' => 'Submit']);
   }

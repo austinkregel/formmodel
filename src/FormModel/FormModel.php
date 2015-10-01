@@ -51,25 +51,35 @@ class FormModel {
            * we will need to loop through the different relations psased through
            */
           if(isset($model->$input)){
-            $return .= $this->modelInput($input);    
+            $return .= $this->modelInput($input, $model->$input);    
           }elseif(!empty($relations)){
             foreach($relations as $relation){
               $old_input = null;
+              /**
+               * Here is where the relation magic happens. We need to see if, 
+               * ex. user_id exists. if it does it will replace user_ with
+               * nothing so you'll be left with just id so then it will
+               * get the information for that model's relation.
+               */
               if(stripos($input, $relation)!== false){
                   $old_input = $input;
                   $input = str_replace($relation.'_', '', $input);
               }
+              /**
+               * Here we need to build the model's input field since there is
+               * a relation on the base mode. We also need to grep the old 
+               * input field and any old kind of data.
+               */
               if(isset($model->$rel->$input)){
-                $return .= $this->modelInput($input, $old_input);    
+                $return .= $this->modelInput($model->$rel, $input, $old_input);    
               }
               
             }
           }else $return .= $this->modelInput($input);
       }
-      $return .= '<input type="submit" class="btn btn-info pull-right" value="Submit">';
 
 
-      return $return;
+      return $return. $this->submit();
   }
 
   /**
@@ -84,7 +94,7 @@ class FormModel {
    *
    * @return String (an HTML input element)
    */
-  private function modelInput($input, $old_input = null)
+  private function modelInput(Model $model, $input, $old_input = null)
   {
       $return = '';
       $old_input =!empty($old_input)?$old_input:$input;
@@ -135,15 +145,6 @@ class FormModel {
                 'class' => 'form-control',
                 'name' => $old_input
               ]);
-        //       $return .= '<div class="form-group">
-        //   <label for="inputSubject" class="col-sm-2 control-label">'.$this->inputToRead(!empty($old_input)?$old_input:$input).'</label>
-        //   <div class="col-sm-10">
-        //     <select type="'.$type.'" class="form-control" name="'.$input.'">
-        //       <option value="0" >No</option>
-        //       <option value="1">Yes</option>s
-        //     </select>
-        //   </div>
-        // </div>';
           } else {
             $return .= $this->bootstrapInput([
               'type' => $type,
@@ -160,28 +161,15 @@ class FormModel {
             'type' => $type,
             'class' => 'form-control',
             'name' => $old_input
-          ]);
-          // $return .= '
-          // <label for="inputSubject" class="col-sm-2 control-label">'.$this->inputToRead($old_input).'
-          // <select type="'.$type.'" class="form-control" name="'.$old_input.'">
-          //   <option value="0">No</option>
-          //   <option value="1">Yes</option>
-          // </select></label>';
+          ]);;
       } else {
         $return .= $this->input([
-              'type' => $type,
-              'id' => $input,
-              'name' => $old_input,
-              'placeholder' => $this->inputToRead($old_input),
-              'label' => $this->inputToRead($old_input),
-            ]);
-          /*$return = '
-          <label class="col-sm-2 control-label">'.$this->inputToRead($old_input).'</label>
-            <input type="'.$type.'" class="form-control" id="'.$input.'" name="'.$old_input.'" 
-            					placeholder="'.$this->inputToRead($old_input).'" '.
-                                            (!empty($model->$input) ? 'value="'.((stripos($old_input, 'password') !== false) ? '' : $model->$input): '').'"
-  											id="'.((stripos($old_input, 'date') !== false | stripos($old_input, '_date') !== false)).' '.
-                                                    (!empty($model->$input) ? ' value="'.$model->$input.'"' : '').'>';*/
+          'type' => $type,
+          'id' => $input,
+          'name' => $old_input,
+          'placeholder' => $this->inputToRead($old_input),
+          'label' => $this->inputToRead($old_input),
+        ]);
       }
     }
     return $return;

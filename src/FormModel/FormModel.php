@@ -155,7 +155,7 @@ class FormModel {
               'name' => $old_input,
               'placeholder' => $this->inputToRead($old_input),
               'label' => $this->inputToRead($old_input),
-              'value' => !empty($model->$input)?$model->$input:''
+              'value' => !empty($model->$input) &&(stripos($input, 'password') === false)?$model->$input:''
             ]);
           }
       } else { //not bootstrap

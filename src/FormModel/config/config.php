@@ -1,8 +1,7 @@
 <?php
-
-return [
-  'using' => [
-    'csrf' => true,
-    'bootstrap' => true,
-  ]
-];
+	return [
+	  'using' => [
+	    'csrf' => true,
+	    'bootstrap' => true,
+	  ]
+	];

@@ -1,4 +1,5 @@
 <?php
+
 namespace Kregel\FormModel\Facades;
 
 use Illuminate\Support\Facades\Facade;
@@ -9,4 +10,4 @@ class FormModel extends Facade
     {
         return 'formmodel';
     }
-}
+} 

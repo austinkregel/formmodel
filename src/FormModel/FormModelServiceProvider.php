@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Kregel\FormModel;
 
@@ -15,29 +15,25 @@ class FormModelServiceProvider extends ServiceProvider
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
-    public function register()
+    public function register() 
     {
         //
         $this->app->bind('formmodel', function () {
-          return new Kregel\FormModel\Facades\FormModel;
+          return new Kregel\FormModel\Facades\FormModel();
         });
         $this->app->alias('FormModel', 'Kregel\FormModel\FormModel');
     }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->publishes([
-            __DIR__.'/config/config.php' => config_path('formmodel.php'),
-        ]);
-    }
+  /**
+   * Bootstrap any application services.
+   */
+  public function boot()
+  {
+      $this->publishes([
+          __DIR__.'/config/config.php' => config_path('kregel/formmodel.php'),
+      ]);
+  }
 
     /**
      * Get the services provided by the provider.

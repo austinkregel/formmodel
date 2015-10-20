@@ -105,7 +105,7 @@ class FormModel
    *
    * @return String (an HTML input element)
    */
-  private function modelInput(Model $model, $input, $old_input = null)
+  private function modelInput(Model $model, $input, $old_input = null, $edit = false)
   {
       $return = '';
       $old_input = !empty($old_input) ? $old_input : $input;

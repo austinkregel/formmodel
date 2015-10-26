@@ -22,7 +22,7 @@ To get it to work properly, similar to how it works in my [Warden package](https
   ```php
   'aliases' => [
     ...,
-    'FormModel' => Kregel\FormModel\Facades\FormModel,
+    'FormModel' => Kregel\FormModel\Facades\FormModel::class,
     ...,
   ]
   ```

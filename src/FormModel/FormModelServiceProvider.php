@@ -16,13 +16,9 @@ class FormModelServiceProvider extends ServiceProvider
     /**
      * Register the service provider.
      */
-    public function register() 
+    public function register()
     {
         //
-        $this->app->bind('formmodel', function () {
-          return new FormModel;
-        });
-        $this->app->alias('formmodel', Facades\FormModel::class);
     }
 
   /**
@@ -30,7 +26,10 @@ class FormModelServiceProvider extends ServiceProvider
    */
   public function boot()
   {
+
+      $this->loadViewsFrom(__DIR__.'/resources/views', 'formmodel');
       $this->publishes([
+          __DIR__.'/resources/views' => base_path('resources/views/vendor/formmodel'),
           __DIR__.'/config/config.php' => config_path('kregel/formmodel.php'),
       ]);
   }

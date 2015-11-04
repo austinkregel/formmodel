@@ -37,8 +37,7 @@
             if (xmlhttp.readyState == 4) {
                 var response = JSON.parse(xmlhttp.responseText);
                 vm.$data.response = response.message;
-                var respArea = document.getElementById('response'),
-                    classes;
+                var respArea = document.getElementById('response');
                 if(!respArea.classList.contains('alert)')){
                     respArea.className = 'alert ';
                 }

@@ -52,7 +52,7 @@ class FormModel
             $return .= $this->input(['type' => 'hidden', 'name' => '_method', 'value' => $method]);
         }
 
-        /*
+       /*
         * This feature is coming soon. It needs more testing.
         */
         if (!empty($relations)) {
@@ -60,7 +60,7 @@ class FormModel
             $return .= $this->input(['type' => 'hidden', 'name' => '_relations', 'value' => $relations]);
         }
         foreach ($fillable as $input) {
-            /*
+           /*
             * Here we need to do a model check. We need ensure the input
             * or desired attribute exists on the model, if it doesn't exist
             * we will need to loop through the different relations psased through
@@ -70,7 +70,7 @@ class FormModel
             } elseif (!empty($relations)) {
                 foreach ($relations as $relation) {
                     $old_input = null;
-                    /*
+                   /*
                     * Here is where the relation magic happens. We need to see if,
                     * ex. user_id exists. if it does it will replace user_ with
                     * nothing so you'll be left with just id so then it will
@@ -141,7 +141,9 @@ class FormModel
     /**
      * # N/A request
      * This will allow you to get the proper input type for an HTML form.
-     * It will extract the names from the.
+     * It will extract the names from the a model.
+     *
+     * TODO: Clean up the methods. Shrink the size of this. To much for one method.
      *
      * @param Model $model
      * @param String $input
@@ -206,6 +208,17 @@ class FormModel
                     'v-model' => 'data.' . $old_input,
                 ]);
                 $this->vue_components[] = $old_input;
+            } elseif ($type === 'text') {
+                $this->vue_components[] = $old_input;
+                $return .= $this->bootstrapTextarea([
+                    'type' => $type,
+                    'id' => $input,
+                    'class' => 'form-control',
+                    'name' => $old_input,
+                    'v-model' => 'data.' . $old_input,
+                    'placeholder' => $this->inputToRead($old_input),
+                    'label' => $this->inputToRead($old_input),
+                ], (!empty($model->$input) && !(stripos($input, 'password') !== false)) ? $model->$input : '');
             } else {
                 $this->vue_components[] = $old_input;
                 $return .= $this->bootstrapInput([
@@ -219,13 +232,24 @@ class FormModel
                     'value' => (!empty($model->$input) && !(stripos($input, 'password') !== false)) ? $model->$input : '',
                 ]);
             }
-        } else { //not bootstrap
+        } else { // not bootstrap
             if ($type === 'select') {
                 $return .= $this->boolSelect([
                     'type' => $type,
                     'class' => 'form-control',
                     'name' => $old_input,
                     'v-model' => 'data.' . $old_input,
+                ]);
+                $this->vue_components[] = $old_input;
+            } elseif($type === 'text'){
+                $return .= $this->input([
+                    'type' => $type,
+                    'id' => $input,
+                    'name' => $old_input,
+                    'placeholder' => $this->inputToRead($old_input),
+                    'label' => $this->inputToRead($old_input),
+                    'v-model' => 'data.' . $old_input,
+                    'value' => !empty($model->$input) ? $model->$input : '',
                 ]);
                 $this->vue_components[] = $old_input;
             } else {
@@ -243,6 +267,43 @@ class FormModel
         }
 
         return $return;
+    }
+
+    /**
+     * @param array $options
+     * @return string
+     */
+    public function bootstrapBoolSelect($options = [])
+    {
+        $label = !empty($options['label']) ? '<label class="col-md-12"><div class="col-md-3">' . $this->inputToRead($options['label']) . '</div>' : '';
+
+        return '<div class="form-group">' .
+        (!empty($label) ? ($label) : '') .
+        '<div class="col-md-9">
+                <select' . $this->attributes($options) . '>
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>' . (!empty($label) ?
+            '</div></label>' : '') .
+        '</div>';
+    }
+
+    /**
+     * Eventually will be used to convert common shortnames or
+     * common coding errors to common english.
+     *
+     * @param String $input
+     *
+     * @return String
+     */
+    private function inputToRead($input)
+    {
+        if ($input === 'path') {
+            $input = 'file';
+        } elseif ($input === 'desc') {
+            $input = 'description';
+        }
+        return ucwords(preg_replace('/[-_]/', ' ', $input));
     }
 
     /**
@@ -267,35 +328,19 @@ class FormModel
         . '</div>';
     }
 
-    /**
-     * Eventually will be used to convert common shortnames or
-     * common coding errors to common english.
-     *
-     * @param String $input
-     *
-     * @return String
-     */
-    private function inputToRead($input)
+    public function bootstrapTextarea($options = [], $text)
     {
-        if ($input === 'path') {
-            $input = 'file';
-        } elseif ($input === 'desc') {
-            $input = 'description';
-        }
+        $label = !empty($options['label']) ?
+            '<label class="col-md-12 ">
+              <div class="col-md-3 text-right control-label">' . $this->inputToRead($options['label']) . '</div>' : '';
 
-        return ucwords(preg_replace('/[-_]/', ' ', $input));
-    }
-
-    /**
-     * @return String html submit input
-     */
-    public function submit()
-    {
-        if (config('kregel.formmodel.using.bootstrap')) {
-            return $this->bootstrapInput(['type' => 'submit', 'class' => 'btn btn-primary pull-right', 'value' => 'Submit']);
-        } else {
-            return $this->bootstrapInput(['type' => 'submit', 'value' => 'Submit']);
-        }
+        return '<div class="form-group">' .
+        (!empty($label) ? ($label) : '') .
+        '<div class="col-md-' . (!empty($label) ? '9' : '12') . '">
+                <textarea' . $this->attributes($options) . '>'.$text.'</textarea>
+              </div>' .
+        (!empty($label) ? '</label>' : '')
+        . '</div>';
     }
 
     /**
@@ -310,21 +355,18 @@ class FormModel
     }
 
     /**
-     * @param array $options
-     * @return string
+     * @return String html submit input
      */
-    public function bootstrapBoolSelect($options = [])
+    public function submit()
     {
-        $label = !empty($options['label']) ? '<label class="col-md-12"><div class="col-md-3">' . $this->inputToRead($options['label']) . '</div>' : '';
+        if (config('kregel.formmodel.using.bootstrap')) {
+            return $this->bootstrapInput(['type' => 'submit', 'class' => 'btn btn-primary pull-right', 'value' => 'Submit']);
+        } else {
+            return $this->bootstrapInput(['type' => 'submit', 'value' => 'Submit']);
+        }
+    }
 
-        return '<div class="form-group">' .
-        (!empty($label) ? ($label) : '') .
-        '<div class="col-md-9">
-                <select' . $this->attributes($options) . '>
-                  <option value="0">No</option>
-                  <option value="1">Yes</option>
-                </select>' . (!empty($label) ?
-            '</div></label>' : '') .
-        '</div>';
+    public function textarea($options, $text){
+        return '<textarea' . $this->attributes($options) . '>'.$text.'</textarea>';
     }
 }

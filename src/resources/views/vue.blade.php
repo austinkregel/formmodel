@@ -9,10 +9,10 @@
             <?php
                 $count = count($components);
                 $i =0;
-                foreach($components as $c){
-                    echo "\t".$c.': \'\''.((($count - 1) == $i)?'':','). "\n";
-                    $i++;
-                }?>
+            foreach($components as $c){
+                echo "\t".$c.': \'\''.((($count - 1) == $i)?'':','). "\n";
+                $i++;
+            }?>
         }
     };
     var vm;
@@ -21,7 +21,10 @@
         data: data,
         methods: {
             makeRequest: function (e) {
-                request(e.target.action, {_token:'{{ csrf_token() }}', _method: '{{$type}}'}, function(responseArea){
+                e.preventDefault();
+                request(e.target.action,
+                        this.$data.data
+                        , function(responseArea){
                     if(responseArea.classList.contains('alert')){
                         responseArea.className += 'alert-success ';
                         responseArea.className = responseArea.className.replace(/\balert-.*\s/g, ' alert-success');
@@ -44,5 +47,6 @@
             }
         }
     });
+    @include('formmodel::request', ['type' => $type])
+
 </script>
-@include('formmodel::request', ['type' => $type])

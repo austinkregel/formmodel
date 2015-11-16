@@ -1,4 +1,3 @@
-<script>
 function request(url, data, success, fail, nochange) {
     var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
     xmlhttp.open("{{$type}}", url);
@@ -28,4 +27,3 @@ function request(url, data, success, fail, nochange) {
     };
     xmlhttp.send(JSON.stringify(data));
 }
-</script>

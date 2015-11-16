@@ -30,7 +30,6 @@ class FormModelServiceProvider extends ServiceProvider
       $this->loadViewsFrom(__DIR__.'/../resources/views', 'formmodel');
       $this->publishes([
           __DIR__.'/../resources/views' => base_path('resources/views/vendor/formmodel'),
-
       ], 'views');
       $this->publishes([
           __DIR__.'/../config/config.php' => config_path('kregel/formmodel.php'),

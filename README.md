@@ -1,3 +1,5 @@
+(Please note there are quite a few changes between this branch and the 2.0 branch. The 2.0 branch uses vuejs and ajax to aid in the process of building/making/managing forms. If you notice a functionallity difference between 1.0 and 2.0 other than 2.0 using vue.js, please submit a pull request for the features and I'll update it.
+I currently don't have the time to manage both branches.
 # What is this package?
 This package was created to help decrease the time it takes to echo out a form relating to a given [Model](http://laravel.com/docs/master/eloquent) while still giving the developer the ultimate amount of flexibility . 
 

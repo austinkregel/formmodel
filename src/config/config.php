@@ -3,6 +3,6 @@
 return [
   'using' => [
     'csrf' => true,
-    'bootstrap' => true,
+    'framework' => 'bootstrap',
   ],
 ];

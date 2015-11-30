@@ -45,6 +45,9 @@ class MyFramework extends FrameworkInputs implements FrameworkInterface
     }
 }
 ```
+
+[![downloads](https://img.shields.io/packagist/dt/kregel/formmodel.svg)](https://packagist.org/packages/kregel/formmodel)
+
 # What is this package?
 This package was created to help decrease the time it takes to echo out a form relating to a given [Model](http://laravel.com/docs/master/eloquent) while still giving the developer the ultimate amount of flexibility . 
 
@@ -125,3 +128,4 @@ protected function getNewModel($model_name, FormModel $form)
 
 # Questions?
 Email me (my email is on [my github page](http://github.com/austinkregel)), or you can drop an issue. :)
+

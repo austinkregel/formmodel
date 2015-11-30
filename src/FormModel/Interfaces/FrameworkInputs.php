@@ -12,6 +12,10 @@ abstract class FrameworkInputs
     /**
      * @var
      */
+    protected $vue_components;
+    /**
+     * @var
+     */
     protected $location;
 
     public function plainTextarea($options, $text = '')
@@ -30,7 +34,7 @@ abstract class FrameworkInputs
      *
      * @return String $attr_string
      */
-    private function attributes(Array $attr)
+    public function attributes(Array $attr)
     {
         $attr_string = '';
         foreach ($attr as $name => $value) {
@@ -76,26 +80,7 @@ abstract class FrameworkInputs
         return '<input' . $this->attributes($options) . '>';
     }
 
-    public function form(Array $options = [])
-    {
-
-        $method = empty($options['method']) ? $options['method'] : '';
-        if (in_array(strtolower($method), ['get', 'post'])) {
-            $real_method = $method;
-        } else {
-            $real_method = 'POST';
-        }
-        $options['method'] = $real_method;
-        $options['action'] = $this->location;
-        return '<form ' . $this->attributes($options) . '>' .
-            // Pass the method through so the form knows how to handle it's self (with laravel)
-            $this->method($method) .
-            // Check and fill the csrf token if it's configured for it.
-            $this->csrf() .
-            $this->buildForm()
-        . '</form>';
-
-    }
+    public abstract function form(Array $options = []);
 
     public function method($method)
     {
@@ -168,7 +153,25 @@ abstract class FrameworkInputs
         return !empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
     }
 
-
+    /**
+     * This is the main baby for FormModel. This is the quickest way to
+     * make new forms for models for creation or for editing/updating.
+     * It will use and extract the fillbale or the visible properties from
+     * Eloquent models. It will always prefer things in the visible attribute
+     * This is because there might be an attribute from the fillable attribute
+     * that you might not want to allow the end user to see.
+     *
+     * ex. Some kind of relation, I often use the User->id realtion and I often
+     * want to hide the User->id relation and just use the Auth::user()->id
+     * When the form is posted.
+     *
+     * @param String $input
+     * @param String $old_input
+     * @param bool $edit
+     *
+     * @throws \Exception
+     * @return String (an HTML form)
+     */
     protected function modelInput($input, $old_input = null, $edit = false){
         throw new \Exception('Some thing went wrong! You must not be setting the modelInput method!');
     }

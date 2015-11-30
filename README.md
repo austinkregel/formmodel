@@ -1,6 +1,51 @@
-# This currently broken...
+## Oh crap! an update broke my App!! WHAT DO I DOOO!? FIX IT NOW!!
 
-(Please note there are quite a few changes between this branch and the 1.0 branch. This branch uses vuejs and ajax to aid in the process of building/making/managing forms. If you notice a functionallity difference between 1.0 and 2.0 other than 2.0 using vue.js, please submit a pull request for the features and I'll update it. I currently don't have the time to manage both branches.
+Please, before you raise a lynch mob on Twitter, use your brain and the wonderful human powers of deductive reasoning.
+
+So, as of 2.0, there was a huge structure change with... Well, everything. I made the whole system a bit more modular
+and extensible. So instead of needing to create a new instance of your model AND FormModel, now you just need to new up
+a FormModel instance. Or... If you have our facade set up, you can use the facade.
+
+### Extending
+
+You can extend this system just like you would with [my Menu Package](https://github.com/austinkregel/Menu). In the section in the config 
+labeled 'custom-framework'. Modify the Namespacing of the newed up object to your class and it should just work (assuming you knew 
+to use the structure of the class below)
+
+```php
+<?php
+
+namespace App\FormModel\Frameworks;
+
+use Kregel\FormModel\Interfaces\FrameworkInputs;
+use Kregel\FormModel\Interfaces\FrameworkInterface;
+
+class MyFramework extends FrameworkInputs implements FrameworkInterface
+{
+    // The only method that you NEED is the form function
+    public function form(Array $options = []){
+        // Do Stuff (build the form)
+        
+        $method = empty($options['method']) ? $options['method'] : '';
+        if (in_array(strtolower($method), ['get', 'post'])) {
+            $real_method = $method;
+        } else {
+            $real_method = 'POST';
+        }
+        $options['method'] = $real_method;
+        $options['action'] = $this->location;
+        return '<form ' . $this->attributes($options) . '>' .
+                // Pass the method through so the form knows how to handle it's self (with laravel)
+                $this->method($method) .
+                // Check and fill the csrf token if it's configured for it.
+                $this->csrf() .
+                $this->buildForm() .
+                $this->submit([]) .
+            '</form>';
+    }
+}
+```
+
 # What is this package?
 This package was created to help decrease the time it takes to echo out a form relating to a given [Model](http://laravel.com/docs/master/eloquent) while still giving the developer the ultimate amount of flexibility . 
 
@@ -8,7 +53,7 @@ This package was created to help decrease the time it takes to echo out a form r
 To get it to work properly, similar to how it works in my [Warden package](https://github.com/austinkregel/warden), it's recommended to do the following
  
   1.  composer require kregel/formmodel
-      or add `"kregel/formmodel":"^1.0"` to your composer.json file, just be sure to use `composer update` with that statement, or if you haven't build your dependancies use `composer install` instead.
+      or add `"kregel/formmodel":"^2.0"` to your composer.json file, just be sure to use `composer update` with that statement, or if you haven't build your dependancies use `composer install` instead.
       
       
   2.  Register the service provider with your `config/app.php` file
@@ -33,36 +78,49 @@ To get it to work properly, similar to how it works in my [Warden package](https
   5.  Use your favorite way to new up a FormModel, this can be done using the Facade or by just doing 
   
   ```php 
-  $form = new Kregel\FormModel\FormModel
+  $form = new Kregel\FormModel\FormModel;
   ```
-  6.  To actually get the desired output of the form you'll need to call the `modelForm` method the parameters it needs are listed
-    *  Any class that extends Model (so basically your desired model)
-    *  The fields you want to have filled or shown to the end user. I use the code below to resolve the desired fields from my User model.
-    
-    ```php
-    $field_names = !empty($user->getVisible()) ? 
-                          $user->getVisible() : 
-                          $user->getFillable();
-    ```
-    *  The route you want it to go to, it's assumed that you want to have a custom route for posting, putting, deleting or getting the information. 
-    *  Put any relations the model has that you want to update as well. So if your user has a few posts, just put `post` or `posts` there, or whatever the realtion is named.
-    *  This is the method type you want to use. (POST, PUT, DELETE, or GET)
+  6.  
+     Use something similar to the following in your controller, or in your view (maybe you injected it?)
+ ```php
+  $form->using(config('kregel.formmodel.using.framework'))
+          ->withModel($model)
+          ->submitTo(route('warden::api.create-model'))
+          ->form([
+              'method' => 'post',
+              'enctype' =>'multipart/form-data'
+          ]);
+  ```
+
   7.  Print the results!
   
 # Do you have an example?
-Duhh! Let it be known that this is a method in one of my controllers.
-```php
-public function getUser($id, FormModel $form){
-    $user = User::find($id);
+Duhh! Let it be known that this is a method in one of the controllers from my [Warden package](https://github.com/austinkregel/warden).
 
-    $field_names = !empty($user->getVisible()) ? 
-                      $user->getVisible() : 
-                       $user->getFillable();
-                       
-    $form_info = $form->modelForm($user, $field_names, '/user/manage/'.$user->id, [], 'PUT');
-    
-    return view('view-user')
-            ->with('form', $form_info);
+```php
+protected function getNewModel($model_name, FormModel $form)
+{
+    /*
+     * We need to grab the model from the config and select one entry for
+     * that model from within the database.
+     */
+    $model = $this->findModel($model_name);
+
+    /*
+     * Here we generate the form to update the model using the kregel/formmodel
+     * package
+     */
+    $form_info = $form->using(config('kregel.formmodel.using.framework'))
+                        ->withModel($model)
+                        ->submitTo(route('warden::api.create-model'))
+                        ->form([
+                            'method' => 'post',
+                            'enctype' =>'multipart/form-data'
+                        ]);
+
+    return view('warden::view-model')
+            ->with('form', $form_info)
+            ->with('model_name', $model_name);
 }
 ```
 

@@ -13,9 +13,9 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
         return '<div class="form-group">
                 '.(empty($label) | (substr($label,0,1) == '_') ?'':'<label class="col-md-4 control-label">' . $label . '</label>').
-            '<div class="class="col-md-6">' . parent::plainInput(array_merge($options,[
+            '<div class="class="col-md-6">' . parent::plainInput(array_merge([
             'class' => 'form-control'
-        ])) . '</div>
+        ], $options)) . '</div>
         </div>';
     }
 
@@ -24,9 +24,9 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
         return '<div class="form-group">
     '.(empty($label) | (substr($label,0,1) == '_') ?'':'<label class="col-md-4 control-label">' . $label . '</label>').
-            '<div class="class="col-md-6">' . parent::plainTextarea(array_merge($options,[
+            '<div class="class="col-md-6">' . parent::plainTextarea(array_merge([
            'class' => 'form-control'
-        ]), $text) . '</div>
+        ], $options), $text) . '</div>
         </div>';
     }
 
@@ -36,9 +36,9 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
         return '<div class="form-group">
                 '.(empty($label) | (substr($label,0,1) == '_') ?'':'<label class="col-md-4 control-label">' . $label . '</label>').
         '<div class="class="col-md-6">'
-        . parent::plainSelect($configs, array_merge($options,[
+        . parent::plainSelect($configs, array_merge([
             'class' => 'form-control'
-        ])) . '</div>
+        ], $options)) . '</div>
         </div>';
     }
 
@@ -48,9 +48,9 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
 
         return '<div class="form-group">
                 '.(empty($label) | (substr($label,0,1) == '_') ?'':'<label class="col-md-4 control-label">' . $label . '</label>').
-        '<div class="class="col-md-6">' .  parent::plainSubmit(array_merge($options,[
-            'class' => 'btn btn-control'
-        ])) . '</div>
+        '<div class="class="col-md-6">' .  parent::plainSubmit(array_merge([
+                'class' => 'btn btn-primary pull-right'
+            ], $options)) . '</div>
         </div>';
     }
 
@@ -101,5 +101,29 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
                             'password') !== false)) ? $this->model->$input : '',
             ]);
         }
+    }
+
+    /**
+     * Generate the form.
+     * @param array $options
+     * @return string
+     */
+    public function form(Array $options = []) {
+        $method = empty($options['method']) ? $options['method'] : '';
+        if (in_array(strtolower($method), ['get', 'post'])) {
+            $real_method = $method;
+        } else {
+            $real_method = 'POST';
+        }
+        $options['method'] = $real_method;
+        $options['action'] = $this->location;
+        return '<form ' . $this->attributes($options) . '>' .
+                // Pass the method through so the form knows how to handle it's self (with laravel)
+                $this->method($method) .
+                // Check and fill the csrf token if it's configured for it.
+                $this->csrf() .
+                $this->buildForm() .
+                $this->submit([]) .
+            '</form>';
     }
 }

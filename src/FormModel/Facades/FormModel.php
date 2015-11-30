@@ -10,4 +10,4 @@ class FormModel extends Facade
     {
         return 'formmodel';
     }
-} 
+}

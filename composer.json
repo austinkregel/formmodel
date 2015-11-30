@@ -1,7 +1,7 @@
 {
     "name": "kregel/formmodel",
     "description": "A quick way to make forms for your Laravel models",
-    "keywords": ["crud", "form-generation", " html", "laravel"],
+    "keywords": ["crud", "form-generation", " html", "laravel", "vue-js", "vuejs"],
     "authors": [
         {
             "name": "Austin Kregel",

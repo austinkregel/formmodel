@@ -6,45 +6,6 @@ So, as of 2.0, there was a huge structure change with... Well, everything. I mad
 and extensible. So instead of needing to create a new instance of your model AND FormModel, now you just need to new up
 a FormModel instance. Or... If you have our facade set up, you can use the facade.
 
-### Extending
-
-You can extend this system just like you would with [my Menu Package](https://github.com/austinkregel/Menu). In the section in the config 
-labeled 'custom-framework'. Modify the Namespacing of the newed up object to your class and it should just work (assuming you knew 
-to use the structure of the class below)
-
-```php
-<?php
-
-namespace App\FormModel\Frameworks;
-
-use Kregel\FormModel\Interfaces\FrameworkInputs;
-use Kregel\FormModel\Interfaces\FrameworkInterface;
-
-class MyFramework extends FrameworkInputs implements FrameworkInterface
-{
-    // The only method that you NEED is the form function
-    public function form(Array $options = []){
-        // Do Stuff (build the form)
-        
-        $method = empty($options['method']) ? $options['method'] : '';
-        if (in_array(strtolower($method), ['get', 'post'])) {
-            $real_method = $method;
-        } else {
-            $real_method = 'POST';
-        }
-        $options['method'] = $real_method;
-        $options['action'] = $this->location;
-        return '<form ' . $this->attributes($options) . '>' .
-                // Pass the method through so the form knows how to handle it's self (with laravel)
-                $this->method($method) .
-                // Check and fill the csrf token if it's configured for it.
-                $this->csrf() .
-                $this->buildForm() .
-                $this->submit([]) .
-            '</form>';
-    }
-}
-```
 
 [![downloads](https://img.shields.io/packagist/dt/kregel/formmodel.svg)](https://packagist.org/packages/kregel/formmodel)
 
@@ -123,6 +84,45 @@ protected function getNewModel($model_name, FormModel $form)
     return view('warden::view-model')
             ->with('form', $form_info)
             ->with('model_name', $model_name);
+}
+```
+### Extending
+
+You can extend this system just like you would with [my Menu Package](https://github.com/austinkregel/Menu). In the section in the config 
+labeled 'custom-framework'. Modify the Namespacing of the newed up object to your class and it should just work (assuming you knew 
+to use the structure of the class below)
+
+```php
+<?php
+
+namespace App\FormModel\Frameworks;
+
+use Kregel\FormModel\Interfaces\FrameworkInputs;
+use Kregel\FormModel\Interfaces\FrameworkInterface;
+
+class MyFramework extends FrameworkInputs implements FrameworkInterface
+{
+    // The only method that you NEED is the form function
+    public function form(Array $options = []){
+        // Do Stuff (build the form)
+        
+        $method = empty($options['method']) ? $options['method'] : '';
+        if (in_array(strtolower($method), ['get', 'post'])) {
+            $real_method = $method;
+        } else {
+            $real_method = 'POST';
+        }
+        $options['method'] = $real_method;
+        $options['action'] = $this->location;
+        return '<form ' . $this->attributes($options) . '>' .
+                // Pass the method through so the form knows how to handle it's self (with laravel)
+                $this->method($method) .
+                // Check and fill the csrf token if it's configured for it.
+                $this->csrf() .
+                $this->buildForm() .
+                $this->submit([]) .
+            '</form>';
+    }
 }
 ```
 

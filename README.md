@@ -45,7 +45,6 @@ class MyFramework extends FrameworkInputs implements FrameworkInterface
     }
 }
 ```
-
 # What is this package?
 This package was created to help decrease the time it takes to echo out a form relating to a given [Model](http://laravel.com/docs/master/eloquent) while still giving the developer the ultimate amount of flexibility . 
 

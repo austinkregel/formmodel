@@ -22,6 +22,6 @@ class BootstrapVue extends Bootstrap
 
     public function modelInput($input, $old_input = null, $edit = false){
         $this->vue_components[] = $old_input;
-        parent::modelInput($input, $old_input, $edit);
+        return parent::modelInput($input, $old_input, $edit);
     }
 }

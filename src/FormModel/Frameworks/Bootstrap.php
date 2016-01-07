@@ -62,20 +62,20 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
      * TODO: Clean up the methods. Shrink the size of this. To much for one method.
      *
      * @param String $input
-     * @param Array $old_input
+     * @param Array $input
      * @param Boolean $edit
      *
      * @return String (an HTML input element)
      */
     protected function modelInput($input, $old_input = null, $edit = false)
     {
-        $type = $this->getInputType($input, $old_input, $edit);
+        $type = $this->getInputType($input, $input, $edit);
         if ($type === 'select') {
             return $this->select([
                 'type' => $type,
                 'class' => 'form-control',
-                'name' => $old_input,
-                'v-model' => 'data.' . $old_input,
+                'name' => $input,
+                'v-model' => 'data.' . $input,
             ], [
                 false => 'No',
                 true => 'Yes'
@@ -84,19 +84,19 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
             return $this->textarea([
                 'type' => $type,
                 'class' => 'form-control',
-                'name' => $old_input,
-                'v-model' => 'data.' . $old_input,
-                'placeholder' => $this->inputToRead($old_input),
-                'label' => $this->inputToRead($old_input),
+                'name' => $input,
+                'v-model' => 'data.' . $input,
+                'placeholder' => $this->inputToRead($input),
+                'label' => $this->inputToRead($input),
             ], (!empty($this->model->$input) && !(stripos($input, 'password') !== false)) ? $this->model->$input : '');
         } else {
             return $this->input([
                 'type' => $type,
                 'class' => 'form-control',
-                'name' => $old_input,
-                'v-model' => 'data.' . $old_input,
-                'placeholder' => $this->inputToRead($old_input),
-                'label' => $this->inputToRead($old_input),
+                'name' => $input,
+                'v-model' => 'data.' . $input,
+                'placeholder' => $this->inputToRead($input),
+                'label' => $this->inputToRead($input),
                 'value' => (!empty($this->model->$input) && !(stripos($input,
                             'password') !== false)) ? $this->model->$input : '',
             ]);

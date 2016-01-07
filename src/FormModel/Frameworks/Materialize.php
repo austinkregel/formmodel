@@ -31,7 +31,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      * @param $label
      * @return string
      */
-    private function genId($label)
+    protected function genId($label)
     {
         return strtolower(preg_replace('/[-\s]+/', '_', $label));
     }
@@ -44,42 +44,88 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      * TODO: Clean up the methods. Shrink the size of this. To much for one method.
      *
      * @param String $input
-     * @param Array $old_input
+     * @param Array $input
      * @param Boolean $edit
      *
      * @return String (an HTML input element)
      */
-    protected function modelInput($input, $old_input = null, $edit = false)
+       protected function modelInput($input, $old_input = null, $edit = false)
     {
         $type = $this->getInputType($input, $old_input, $edit);
+        if (strlen($type) > 12) {
+            if (stripos($input, '_id') !== false) {
+                $input = $input;
+                $input = $this->modelSwapType($input);
+                if (!empty(config('kregel.warden.models'))) {
+                    $name = trim($input, '_id');
+                    $class = config('kregel.warden.models.'.$name.'.model');
+                    if (!empty($class)) {
+                        $class = new $class();
+                        $options = Auth::user()->$name;
+                    } else {
+                        $options = $this->model->$name;
+                    }
+                } else {
+                    $options = Auth::user()->$input;
+                }
+                $ops = [];
+                if (!empty($options)) {
+                    foreach ($options as $option) {
+                        $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->name));
+                    }
+                    return $this->select([
+                        'default' => 'Please select a '.trim($input, '_id').' to assign this to',
+                        'type' => 'select',
+                        'name' => $input,
+                        'v-model' => 'data.'.$input,
+                        '@update' => 'updateSelect',
+                        'id' => $this->genId($input),
+                        'lazy' => '',
+                    ], $ops);
+                }
+            }
+        }
         if ($type === 'select') {
             return $this->select([
                 'type' => $type,
-                'name' => $old_input,
-                'v-model' => 'data.' . $old_input,
-                'id' => $this->genId($old_input)
+                'name' => $input,
+                'v-model' => 'data.'.$input,
+                'id' => $this->genId($input),
             ], [
                 false => 'No',
-                true => 'Yes'
+                true => 'Yes',
             ]);
         } elseif ($type === 'text') {
             return $this->textarea([
                 'type' => $type,
-                'name' => $old_input,
-                'v-model' => 'data.' . $old_input,
-                 'id' => $this->genId($old_input)
+                'name' => $input,
+                'v-model' => 'data.'.$input,
+                'id' => $this->genId($input),
             ], (!empty($this->model->$input) && !(stripos($input, 'password') !== false)) ? $this->model->$input : '');
+        } elseif ($type === 'file') {
+            $label = (!empty($options['name']) ? ucwords($options['name']) : '');
+            $returnable = '<div class="file-field input-field"><div class="btn"><span>Your file</span>
+                '.
+                parent::plainInput([
+                    'type' => $type,
+                    'name' => $input,
+                    'v-el' => str_slug($input),
+                    'class' => 'validate',
+                    'id' => $this->genId($label),
+                    'multiple' => '',
+                ]).(empty($label) | (substr($label, 0,
+                        1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').'
+                </div>
+                <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" placeholder="Upload one or more files">
+              </div>
+            </div>';
+            return $returnable;
         } else {
-            return $this->input([
-                'type' => $type,
-                'name' => $old_input,
-                'v-model' => 'data.' . $old_input,
-                'value' => (!empty($this->model->$input) && !(stripos($input,
-                            'password') !== false)) ? $this->model->$input : '',
-                'id' => $this->genId($old_input)
-            ]);
+            // Default input type
         }
     }
+
 
     /**
      * Generate a select

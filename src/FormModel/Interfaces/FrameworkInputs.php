@@ -143,14 +143,9 @@ abstract class FrameworkInputs
         return $return;
     }
 
-    public function getVisible()
-    {
-        return empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
-    }
-
     public function getFillable()
     {
-        return !empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
+        return empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
     }
 
     /**

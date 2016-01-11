@@ -54,75 +54,86 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
         $type = $this->getInputType($input, $old_input, $edit);
         if (strlen($type) > 12) {
             if (stripos($input, '_id') !== false) {
-                $input = $input;
-                $input = $this->modelSwapType($input);
-                if (!empty(config('kregel.warden.models'))) {
-                    $name = trim($input, '_id');
-                    $class = config('kregel.warden.models.'.$name.'.model');
-                    if (!empty($class)) {
-                        $class = new $class();
-                        $options = Auth::user()->$name;
-                    } else {
-                        $options = $this->model->$name;
+                if ( ! empty( config('kregel.warden.models') )) {// Check if Warden exists
+                    $name    = trim($input, '_id');
+                    $options = ( Auth::user()->$name !== null ) ? Auth::user()->$name : $this->model->$name/* grab the model relation. what to do ifthere is no relation? */
+                    ;
+                    if (empty( $options )) {
+                        $model = config('kregel.warden.models.' . $name . '.model');
+                        if ( ! empty( $model )) {
+                            $options = $model::all();
+                        }
                     }
                 } else {
-                    $options = Auth::user()->$input;
+                    $options = ( Auth::user()->$input !== null ) ? Auth::user()->$input : $this->model->$input;
                 }
-                $ops = [];
-                if (!empty($options)) {
+                $ops = [ ];
+
+                if ( ! empty( $options )) {
                     foreach ($options as $option) {
                         $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->name));
                     }
+
                     return $this->select([
-                        'default' => 'Please select a '.trim($input, '_id').' to assign this to',
-                        'type' => 'select',
-                        'name' => $input,
-                        'v-model' => 'data.'.$input,
+                        'default' => 'Please select a ' . trim($input, '_id') . ' to assign this to',
+                        'type'    => 'select',
+                        'name'    => $input,
+                        'v-model' => 'data.' . $input,
                         '@update' => 'updateSelect',
-                        'id' => $this->genId($input),
-                        'lazy' => '',
+                        'id'      => $this->genId($input),
+                        'lazy'    => ''
                     ], $ops);
                 }
             }
         }
         if ($type === 'select') {
             return $this->select([
-                'type' => $type,
-                'name' => $input,
-                'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
+                'type'    => $type,
+                'name'    => $input,
+                'v-model' => 'data.' . $input,
+                'id'      => $this->genId($input)
             ], [
                 false => 'No',
-                true => 'Yes',
+                true  => 'Yes'
             ]);
-        } elseif ($type === 'text') {
+        } elseif (in_array($type, [
+            'text'
+        ])) {
             return $this->textarea([
-                'type' => $type,
-                'name' => $input,
-                'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
-            ], (!empty($this->model->$input) && !(stripos($input, 'password') !== false)) ? $this->model->$input : '');
+                'type'    => $type,
+                'name'    => $input,
+                'v-model' => 'data.' . $input,
+                'id'      => $this->genId($input)
+            ], ( ! empty( $this->model->$input ) && ! ( stripos($input,
+                        'password') !== false ) ) ? $this->model->$input : '');
         } elseif ($type === 'file') {
-            $label = (!empty($options['name']) ? ucwords($options['name']) : '');
+            $label      = ( ! empty( $options['name'] ) ? ucwords($options['name']) : '' );
             $returnable = '<div class="file-field input-field"><div class="btn"><span>Your file</span>
-                '.
-                parent::plainInput([
-                    'type' => $type,
-                    'name' => $input,
-                    'v-el' => str_slug($input),
-                    'class' => 'validate',
-                    'id' => $this->genId($label),
-                    'multiple' => '',
-                ]).(empty($label) | (substr($label, 0,
-                        1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
+                ' . parent::plainInput([
+                    'type'     => $type,
+                    'name'     => $input,
+                    'v-el'     => str_slug($input),
+                    'class'    => 'validate',
+                    'id'       => $this->genId($label),
+                    'multiple' => ''
+                ]) . ( empty( $label ) | ( substr($label, 0,
+                        1) == '_' ) ? '' : '<label for="' . $this->genId($label) . '">' . $label . '</label>' ) . '
                 </div>
                 <div class="file-path-wrapper">
                 <input class="file-path validate" type="text" placeholder="Upload one or more files">
               </div>
             </div>';
+
             return $returnable;
-        } else {
-            // Default input type
+        } elseif( in_array($type,[
+            'password', 'email', 'date', 'number'
+        ])){
+            return $this->input([
+                'type'    => $type,
+                'name'    => $input,
+                'v-model' => 'data.' . $input,
+                'id'      => $this->genId($input)
+            ]);
         }
     }
 

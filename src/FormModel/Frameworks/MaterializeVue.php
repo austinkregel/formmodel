@@ -23,7 +23,7 @@ class MaterializeVue extends Materialize
     }
 
     public function modelInput($input, $old_input = null, $edit = false){
-        $this->vue_components[] = $old_input;
-        parent::modelInput($input, $old_input, $edit);
+        $this->vue_components[] = $input;
+        parent::modelInput($input, $input, $edit);
     }
 }

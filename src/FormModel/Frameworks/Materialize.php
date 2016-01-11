@@ -114,7 +114,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
                     'id' => $this->genId($label),
                     'multiple' => '',
                 ]).(empty($label) | (substr($label, 0,
-                        1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').'
+                        1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
                 </div>
                 <div class="file-path-wrapper">
                 <input class="file-path validate" type="text" placeholder="Upload one or more files">
@@ -142,7 +142,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             'id' => $this->genId($label)
         ], $options)) .
         (empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="' . $label . '">' . $label . '</label>') .
+                1) == '_') ? '' : '<label for="' . $label . '">' . $this->inputToRead($label) . '</label>') .
         '</div>';
     }
 
@@ -161,7 +161,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             'id' => $this->genId($label)
         ], $options), $text) .
         (empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $label . '</label>') .
+                1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $this->inputToRead($label) . '</label>') .
         '</div>';
     }
 
@@ -179,7 +179,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             'class' => 'validate',
             'id' => $this->genId($label)
         ], $options)) . (empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $label . '</label>') . '
+                1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $this->inputToRead($label) . '</label>') . '
         </div>';
     }
 

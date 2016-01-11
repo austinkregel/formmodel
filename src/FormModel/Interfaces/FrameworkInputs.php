@@ -109,7 +109,7 @@ abstract class FrameworkInputs
              * we will need to loop through the different relations psased through
              */
             if (isset($this->model->$input)) {
-                $return .= $this->modelInput($this->model, $input);
+                $return .= $this->modelInput($input);
             } elseif (!empty($relations)) {
                 foreach ($relations as $relation) {
                     $old_input = null;
@@ -137,7 +137,7 @@ abstract class FrameworkInputs
                     }
                 }
             } else {
-                $return .= $this->modelInput($this->model, $input);
+                $return .= $this->modelInput($input);
             }
         }
         return $return;
@@ -190,7 +190,8 @@ abstract class FrameworkInputs
                     stripos($input, 'recorder_') === false &
                     stripos($input, 'direct_') === false &
                     stripos($input, 'cell_') === false &
-                    stripos($input, 'model') === false
+                    stripos($input, 'model') === false &
+                    stripos($input, 'phone') === false
                 )
             ) |
             (stripos($input, 'count') !== false &

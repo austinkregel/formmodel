@@ -56,7 +56,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             if (stripos($input, '_id') !== false) {
                 if ( ! empty( config('kregel.warden.models') )) {// Check if Warden exists
                     $name    = trim($input, '_id');
-                    $options = ( Auth::user()->$name !== null ) ? Auth::user()->$name : $this->model->$name/* grab the model relation. what to do ifthere is no relation? */
+                    $options = ( auth()->user()->$name !== null ) ? auth()->user()->$name : $this->model->$name/* grab the model relation. what to do ifthere is no relation? */
                     ;
                     if (empty( $options )) {
                         $model = config('kregel.warden.models.' . $name . '.model');
@@ -65,7 +65,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
                         }
                     }
                 } else {
-                    $options = ( Auth::user()->$input !== null ) ? Auth::user()->$input : $this->model->$input;
+                    $options = ( auth()->user()->$input !== null ) ? auth()->user()->$input : $this->model->$input;
                 }
                 $ops = [ ];
 

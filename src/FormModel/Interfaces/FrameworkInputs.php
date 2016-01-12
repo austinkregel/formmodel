@@ -8,11 +8,11 @@ abstract class FrameworkInputs
     /**
      * @var
      */
-    protected $model;
+    public $model;
     /**
      * @var
      */
-    protected $vue_components;
+    public $vue_components;
     /**
      * @var
      */

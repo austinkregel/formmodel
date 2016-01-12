@@ -1,4 +1,4 @@
-function request(url, data, success, fail, nochange) {
+function request(url, data, success, nochange, fail) {
     var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
     xmlhttp.open("{{$type}}", url);
 

@@ -146,15 +146,13 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      */
     public function select(Array $configs, Array $options)
     {
-        $label = (!empty($options['name']) ? ucwords($options['name']) : '');
+        $label = ( ! empty( $options['name'] ) ? ucwords($options['name']) : '' );
 
         return '<div class="input-field">
-        ' . parent::plainSelect($configs, array_merge( [
-            'id' => $this->genId($label)
-        ], $options)) .
-        (empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="' . $label . '">' . $this->inputToRead($label) . '</label>') .
-        '</div>';
+        ' . parent::plainSelect(array_merge([
+                'id' => $this->genId($label)
+            ], $configs), $options) . ( empty( $label ) | ( substr($label, 0,
+                1) == '_' ) ? '' : '<label for="' . $label . '">' . $this->inputToRead($label) . '</label>' ) . '</div>';
     }
 
     /**

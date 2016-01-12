@@ -50,8 +50,9 @@ abstract class FrameworkInputs
 
     public function plainSelect($configs, $options)
     {
+
         return '<select' . $this->attributes($configs) . '>
-                 <option value="" disabled selected>Please select one</option>
+                 <option value="" disabled selected>'.(!empty($configs['default'])?$configs['default']:'Please select one').'</option>
                  ' . $this->buildOptions($options) . '
              </select>';
     }

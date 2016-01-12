@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class FormModel
 {
-    /**
-     * @var
-     */
-    private $vue_components;
-
     public function using($string){
 
         switch($string){
@@ -28,6 +23,4 @@ class FormModel
 
         }
     }
-//FormModel::using(bootstrap-vue)->withModel($user)->submitTo($location)->form();
-//$form->using('bootstrap-vue')->withModel($model)->submitTo($location)->form();
 }

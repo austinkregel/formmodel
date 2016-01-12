@@ -48,5 +48,4 @@
         }
     });
     @include('formmodel::request', ['type' => $type])
-
 </script>

@@ -6,6 +6,7 @@ interface FrameworkInterface
 {
     /**
      * @param array $options
+     *
      * @return mixed
      */
     public function input(Array $options);
@@ -13,6 +14,7 @@ interface FrameworkInterface
     /**
      * @param array $options
      * @param $text
+     *
      * @return mixed
      */
     public function textarea(Array $options, $text);
@@ -20,12 +22,14 @@ interface FrameworkInterface
     /**
      * @param array $configs
      * @param array $options
+     *
      * @return mixed
      */
     public function select(Array $configs, Array $options);
 
     /**
      * @param array $options
+     *
      * @return mixed
      */
     public function submit(Array $options = []);
@@ -33,6 +37,7 @@ interface FrameworkInterface
     /**
      * @param Model $model
      * @param array $options
+     *
      * @return mixed
      */
     public function form(Array $options);

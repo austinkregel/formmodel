@@ -3,6 +3,6 @@
         @{{ response }}
         <div class="close" @click="close">&times;</div>
     </div>
-    {!! $form !!}
+    {!! $form_ !!}
 </div>
-@include('formmodel::vue', ['vue_components' => $vue_components, 'type' => $type])
+@include('formmodel::vue', ['vue_components' => $components, 'type' => $type])

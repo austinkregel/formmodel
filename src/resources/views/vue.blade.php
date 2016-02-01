@@ -8,20 +8,21 @@
             @endif
             <?php
                 $count = count($components);
-                $i =0;
-            foreach($components as $c){
-                echo "\t".$c.': \'\''.((($count - 1) == $i)?'':','). "\n";
-                $i++;
+                $i = 0;
+            foreach ($components as $c) {
+                echo "\t".$c.': \'\''.((($count - 1) == $i) ? '' : ',')."\n";
+                ++$i;
             }?>
         }
     };
-    var vm;
-    vm = new Vue({
+    new Vue({
         el: "#vue-form-wrapper",
         data: data,
         methods: {
             makeRequest: function (e) {
                 e.preventDefault();
+                checkInput(this.$data.data);
+
                 request(e.target.action,
                         this.$data.data
                         , function(responseArea){
@@ -44,7 +45,15 @@
             },
             close: function (e) {
                 this.response = '';
+            },
+            checkInputs: function (data){
+
             }
+        },
+        ready: function(){
+            setTimeout(function(){
+                $('select').material_select();
+            },100);
         }
     });
     @include('formmodel::request', ['type' => $type])

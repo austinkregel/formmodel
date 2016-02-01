@@ -4,10 +4,10 @@ function request(url, data, success, nochange, fail) {
 
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xmlhttp.setRequestHeader("X-Requested-With", 'XMLHttpRequest');
+    xmlhttp.setRequestHeader("X-CSRF-TOKEN", data._token);
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4) {
             var response = JSON.parse(xmlhttp.responseText);
-            vm.$data.response = response.message;
             var respArea = document.getElementById('response');
             if (!respArea.classList.contains('alert)')) {
                 respArea.className = 'alert ';

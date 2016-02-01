@@ -1,4 +1,5 @@
 <?php
+
 namespace Kregel\FormModel\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
@@ -20,8 +21,8 @@ abstract class FrameworkInputs
 
     public function plainTextarea($options, $text = '')
     {
-        return '<textarea' . $this->attributes($options) . '>' .
-            $text . '</textarea>';
+        return '<textarea'.$this->attributes($options).'>'.
+            $text.'</textarea>';
     }
 
     /**
@@ -29,8 +30,8 @@ abstract class FrameworkInputs
      * ex.
      *      id="name".
      *
-     * @param  Array $attr A key value pair of attributes
-     *                      for an HTML Element
+     * @param Array $attr A key value pair of attributes
+     *                    for an HTML Element
      *
      * @return String $attr_string
      */
@@ -39,9 +40,9 @@ abstract class FrameworkInputs
         $attr_string = '';
         foreach ($attr as $name => $value) {
             if (is_array($value)) {
-                $attr_string .= ' ' . $name . '="' . implode(' ', $value) . '"';
+                $attr_string .= ' '.$name.'="'.implode(' ', $value).'"';
             } else {
-                $attr_string .= ' ' . $name . '="' . $value . '"';
+                $attr_string .= ' '.$name.'="'.$value.'"';
             }
         }
 
@@ -50,19 +51,34 @@ abstract class FrameworkInputs
 
     public function plainSelect($configs, $options)
     {
+        if (!empty($configs['default'])) {
+            $default = $configs['default'];
 
-        return '<select' . $this->attributes($configs) . '>
-                 <option value="" disabled selected>'.(!empty($configs['default'])?$configs['default']:'Please select one').'</option>
-                 ' . $this->buildOptions($options) . '
-             </select>';
+            unset($configs['default']);
+        } else {
+            $default = ' ';
+        }
+        $default_text = empty($configs['default_text']) ? '' : $configs['default_text'];
+
+        return '    <select'.$this->attributes($configs).'>'.
+        '<option value="" disabled '.(is_numeric($default) ? '' : 'selected').'>'.$default_text."</option>\n"
+        .$this->buildOptions($options, is_numeric($default) ? $default : false)."
+       </select>\n";
     }
 
-    public function buildOptions($options)
+    public function buildOptions($options, $hasDefault = false)
     {
         $return = '';
+
         foreach ($options as $value => $text) {
-            $return .= '<option ' . $this->attributes(['value' => $value]) . '>' . $text . '</option>';
+            $attr = [];
+            if ($hasDefault !== false && $value === $hasDefault) {
+                $attr['selected'] = 'selected';
+            }
+            $attr['value'] = $value;
+            $return .= '                  <option'.$this->attributes($attr).'>'.$text."</option>\n";
         }
+
         return $return;
     }
 
@@ -78,16 +94,17 @@ abstract class FrameworkInputs
      */
     public function plainInput($options = [])
     {
-        return '<input' . $this->attributes($options) . '>';
+        return '<input'.$this->attributes($options).'>';
     }
 
-    public abstract function form(Array $options = []);
+    abstract public function form(Array $options = []);
 
     public function method($method)
     {
         if (!(in_array(strtolower($method), ['get', 'post']))) {
             return $this->input(['type' => 'hidden', 'name' => '_method', 'value' => $method]);
         }
+
         return '';
     }
 
@@ -96,6 +113,7 @@ abstract class FrameworkInputs
         if (config('kregel.formmodel.using.csrf')) {
             return $this->input(['type' => 'hidden', 'name' => '_token', 'value' => csrf_token()]);
         }
+
         return '';
     }
 
@@ -126,7 +144,7 @@ abstract class FrameworkInputs
                      */
                     if (stripos($input, $relation) !== false) {
                         $old_input = $input;
-                        $input = str_replace($relation . '_', '', $input);
+                        $input = str_replace($relation.'_', '', $input);
                     }
                     /*
                     * Here we need to build the model's input field since there is
@@ -141,6 +159,7 @@ abstract class FrameworkInputs
                 $return .= $this->modelInput($input);
             }
         }
+
         return $return;
     }
 
@@ -163,12 +182,14 @@ abstract class FrameworkInputs
      *
      * @param String $input
      * @param String $old_input
-     * @param bool $edit
+     * @param bool   $edit
      *
      * @throws \Exception
+     *
      * @return String (an HTML form)
      */
-    protected function modelInput($input, $old_input = null, $edit = false){
+    protected function modelInput($input, $old_input = null, $edit = false)
+    {
         throw new \Exception('Some thing went wrong! You must not be setting the modelInput method!');
     }
 
@@ -179,7 +200,7 @@ abstract class FrameworkInputs
             stripos($input, '_id') !== false
         ) {
             if ($edit === false) {
-                return '<!-- There is a relation that requires the key ' . htmlentities($input) . ', assuming that it will be handled later -->';
+                return '<!-- There is a relation that requires the key '.htmlentities($input).', assuming that it will be handled later -->';
             } else {
                 return 'text';
             }
@@ -236,28 +257,47 @@ abstract class FrameworkInputs
         } elseif ($input === 'desc') {
             $input = 'description';
         }
+
         return ucwords(preg_replace('/[-_]/', ' ', $input));
     }
 
     /**
      * Setter function for the desired model.
+     *
      * @param Model $model
+     *
      * @return $this
      */
     public function withModel(Model $model)
     {
         $this->model = $model;
+
         return $this;
     }
 
     /**
-     * Setter function for the desired submit location
+     * Setter function for the desired submit location.
+     *
      * @param $location
+     *
      * @return $this
      */
     public function submitTo($location)
     {
         $this->location = $location;
+
         return $this;
+    }
+
+    /**
+     * Generate the label/id/for for the inputs.
+     *
+     * @param $label
+     *
+     * @return string
+     */
+    protected function genId($label)
+    {
+        return strtolower(preg_replace('/[-\s]+/', '_', $label));
     }
 }

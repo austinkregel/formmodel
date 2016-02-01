@@ -2,23 +2,22 @@
 
 namespace Kregel\FormModel;
 
-use Illuminate\Database\Eloquent\Model;
-
 class FormModel
 {
-    public function using($string){
-
-        switch($string){
+    public function using($string)
+    {
+        switch ($string) {
             case 'bootstrap':
-                return new Frameworks\Bootstrap;
+                return new Frameworks\Bootstrap();
             case 'materialize':
-                return new Frameworks\Materialize;
+                return new Frameworks\Materialize();
             case 'bootstrap-vue':
-                return new Frameworks\BootstrapVue;
+                return new Frameworks\BootstrapVue();
             case 'materialize-vue':
-                return new Frameworks\MaterializeVue;
+                return new Frameworks\MaterializeVue();
             default:
                 $custom_thing = config('kregel.formmodel.using.custom-framework');
+
                 return call_user_func($custom_thing);
 
         }

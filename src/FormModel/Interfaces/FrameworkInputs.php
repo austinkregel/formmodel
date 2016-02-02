@@ -30,12 +30,12 @@ abstract class FrameworkInputs
      * ex.
      *      id="name".
      *
-     * @param Array $attr A key value pair of attributes
+     * @param array $attr A key value pair of attributes
      *                    for an HTML Element
      *
-     * @return String $attr_string
+     * @return string $attr_string
      */
-    public function attributes(Array $attr)
+    public function attributes(array $attr)
     {
         $attr_string = '';
         foreach ($attr as $name => $value) {
@@ -82,22 +82,22 @@ abstract class FrameworkInputs
         return $return;
     }
 
-    public function plainSubmit(Array $options = [])
+    public function plainSubmit(array $options = [])
     {
         return $this->input(array_merge(['type' => 'submit'], $options));
     }
 
     /**
-     * @param Array $options Should contain type, and name
+     * @param array $options Should contain type, and name
      *
-     * @return String html submit input
+     * @return string html submit input
      */
     public function plainInput($options = [])
     {
         return '<input'.$this->attributes($options).'>';
     }
 
-    abstract public function form(Array $options = []);
+    abstract public function form(array $options = []);
 
     public function method($method)
     {
@@ -180,13 +180,13 @@ abstract class FrameworkInputs
      * want to hide the User->id relation and just use the Auth::user()->id
      * When the form is posted.
      *
-     * @param String $input
-     * @param String $old_input
+     * @param string $input
+     * @param string $old_input
      * @param bool   $edit
      *
      * @throws \Exception
      *
-     * @return String (an HTML form)
+     * @return string (an HTML form)
      */
     protected function modelInput($input, $old_input = null, $edit = false)
     {
@@ -246,9 +246,9 @@ abstract class FrameworkInputs
      * Eventually will be used to convert common shortnames or
      * common coding errors to common english.
      *
-     * @param String $input
+     * @param string $input
      *
-     * @return String
+     * @return string
      */
     protected function inputToRead($input)
     {

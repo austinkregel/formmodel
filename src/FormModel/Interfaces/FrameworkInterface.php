@@ -9,7 +9,7 @@ interface FrameworkInterface
      *
      * @return mixed
      */
-    public function input(Array $options);
+    public function input(array $options);
 
     /**
      * @param array $options
@@ -17,7 +17,7 @@ interface FrameworkInterface
      *
      * @return mixed
      */
-    public function textarea(Array $options, $text);
+    public function textarea(array $options, $text);
 
     /**
      * @param array $configs
@@ -25,14 +25,14 @@ interface FrameworkInterface
      *
      * @return mixed
      */
-    public function select(Array $configs, Array $options);
+    public function select(array $configs, array $options);
 
     /**
      * @param array $options
      *
      * @return mixed
      */
-    public function submit(Array $options = []);
+    public function submit(array $options = []);
 
     /**
      * @param Model $model
@@ -40,5 +40,5 @@ interface FrameworkInterface
      *
      * @return mixed
      */
-    public function form(Array $options);
+    public function form(array $options);
 }

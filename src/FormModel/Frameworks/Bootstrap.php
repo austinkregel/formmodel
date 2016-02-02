@@ -15,7 +15,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
      *
      * @return string
      */
-    public function form(Array $options = [])
+    public function form(array $options = [])
     {
         $method = empty($options['method']) ? $options['method'] : '';
         if (in_array(strtolower($method), ['get', 'post'])) {
@@ -31,7 +31,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
         $this->csrf().$this->buildForm().$this->submit([]).'</form>';
     }
 
-    public function submit(Array $options = [])
+    public function submit(array $options = [])
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
@@ -50,50 +50,50 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
      *
      * TODO: Clean up the methods. Shrink the size of this. To much for one method.
      *
-     * @param String  $input
-     * @param Array   $input
-     * @param Boolean $edit
+     * @param string $input
+     * @param array  $input
+     * @param bool   $edit
      *
-     * @return String (an HTML input element)
+     * @return string (an HTML input element)
      */
     protected function modelInput($input, $old_input = null, $edit = false)
     {
         $type = $this->getInputType($input, $input, $edit);
         if ($type === 'select') {
             return $this->select([
-                'type' => $type,
-                'class' => 'form-control',
-                'name' => $input,
+                'type'    => $type,
+                'class'   => 'form-control',
+                'name'    => $input,
                 'v-model' => 'data.'.$input,
             ], [
                 false => 'No',
-                true => 'Yes',
+                true  => 'Yes',
             ]);
         } elseif ($type === 'text') {
             return $this->textarea([
-                'type' => $type,
-                'class' => 'form-control',
-                'name' => $input,
-                'v-model' => 'data.'.$input,
+                'type'        => $type,
+                'class'       => 'form-control',
+                'name'        => $input,
+                'v-model'     => 'data.'.$input,
                 'placeholder' => $this->inputToRead($input),
-                'label' => $this->inputToRead($input),
+                'label'       => $this->inputToRead($input),
             ], (!empty($this->model->$input) && !(stripos($input,
                         'password') !== false)) ? $this->model->$input : '');
         } else {
             return $this->input([
-                'type' => $type,
-                'class' => 'form-control',
-                'name' => $input,
-                'v-model' => 'data.'.$input,
+                'type'        => $type,
+                'class'       => 'form-control',
+                'name'        => $input,
+                'v-model'     => 'data.'.$input,
                 'placeholder' => $this->inputToRead($input),
-                'label' => $this->inputToRead($input),
-                'value' => (!empty($this->model->$input) && !(stripos($input,
+                'label'       => $this->inputToRead($input),
+                'value'       => (!empty($this->model->$input) && !(stripos($input,
                             'password') !== false)) ? $this->model->$input : '',
             ]);
         }
     }
 
-    public function select(Array $configs, Array $options)
+    public function select(array $configs, array $options)
     {
         $label = (!empty($configs['name']) ? str_replace('_', ' ', ucwords(trim($configs['name'], '_id'))) : '');
 
@@ -106,7 +106,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
         </div>';
     }
 
-    public function textarea(Array $options, $text = '')
+    public function textarea(array $options, $text = '')
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
@@ -119,7 +119,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
         ';
     }
 
-    public function input(Array $options)
+    public function input(array $options)
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 

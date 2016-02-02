@@ -17,15 +17,15 @@ class BootstrapVue extends Bootstrap
      *
      * @return string
      */
-    public function form(Array $options = [])
+    public function form(array $options = [])
     {
         $this->options = $options;
         $this->form = parent::form(array_merge(['@submit.prevent' => 'makeRequest'], $this->options));
 
         return view('formmodel::form_types.bootstrap-vue', [
-            'form_' => $this->form,
+            'form_'      => $this->form,
             'components' => $this->vue_components,
-            'type' => $this->options['method'],
+            'type'       => $this->options['method'],
         ]);
     }
 
@@ -64,13 +64,13 @@ class BootstrapVue extends Bootstrap
 
                         return $this->select([
                             'default_text' => 'Please select a '.trim($input, '_id').' to assign this to',
-                            'default' => empty($default) ? '' : $default,
-                            'type' => 'select',
-                            'class' => 'form-control',
-                            'name' => $input,
-                            'v-model' => 'data.'.$input,
-                            '@update' => 'updateSelect',
-                            'id' => $this->genId($input),
+                            'default'      => empty($default) ? '' : $default,
+                            'type'         => 'select',
+                            'class'        => 'form-control',
+                            'name'         => $input,
+                            'v-model'      => 'data.'.$input,
+                            '@update'      => 'updateSelect',
+                            'id'           => $this->genId($input),
                         ], $ops);
                     }
                 }
@@ -79,33 +79,33 @@ class BootstrapVue extends Bootstrap
         if ($type === 'select') {
             return $this->select([
                 'default_text' => 'Please select a '.trim($input, '_id'),
-                'type' => $type,
-                'name' => $input,
-                'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
+                'type'         => $type,
+                'name'         => $input,
+                'v-model'      => 'data.'.$input,
+                'id'           => $this->genId($input),
             ], [
                 false => 'No',
-                true => 'Yes',
+                true  => 'Yes',
             ]);
         } elseif (in_array($type, [
             'text',
         ])) {
             return $this->textarea([
-                'type' => $type,
-                'name' => $input,
+                'type'    => $type,
+                'name'    => $input,
                 'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
+                'id'      => $this->genId($input),
             ], (!empty($this->model->$input) && !(stripos($input,
                         'password') !== false)) ? $this->model->$input : '');
         } elseif ($type === 'file') {
             $label = (!empty($options['name']) ? ucwords($options['name']) : '');
             $returnable = '<div class="file-field input-field"><div class="btn"><span>Your file</span>
                 '.parent::plainInput([
-                    'type' => $type,
-                    'name' => $input,
-                    'v-el' => str_slug($input),
-                    'class' => 'form-control',
-                    'id' => $this->genId($label),
+                    'type'     => $type,
+                    'name'     => $input,
+                    'v-el'     => str_slug($input),
+                    'class'    => 'form-control',
+                    'id'       => $this->genId($label),
                     'multiple' => '',
                 ]).(empty($label) | (substr($label, 0,
                         1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').'
@@ -123,11 +123,11 @@ class BootstrapVue extends Bootstrap
             'number',
         ])) {
             return $this->input([
-                'type' => $type,
-                'name' => $input,
-                'class' => 'form-control',
+                'type'    => $type,
+                'name'    => $input,
+                'class'   => 'form-control',
                 'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
+                'id'      => $this->genId($input),
             ]);
         }
     }

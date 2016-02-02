@@ -14,7 +14,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      *
      * @return string
      */
-    public function form(Array $options = [])
+    public function form(array $options = [])
     {
         $method = empty($options['method']) ? $options['method'] : '';
         if (in_array(strtolower($method), ['get', 'post'])) {
@@ -37,7 +37,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      *
      * @return string
      */
-    public function submit(Array $options = [])
+    public function submit(array $options = [])
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
@@ -56,11 +56,11 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      *
      * TODO: Clean up the methods. Shrink the size of this. To much for one method.
      *
-     * @param String  $input
-     * @param Array   $input
-     * @param Boolean $edit
+     * @param string $input
+     * @param array  $input
+     * @param bool   $edit
      *
-     * @return String (an HTML input element)
+     * @return string (an HTML input element)
      */
     protected function modelInput($input, $old_input = null, $edit = false)
     {
@@ -70,8 +70,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
                 if (!empty(config('kregel.warden.models'))) {
                     // Check if Warden exists
                     $name = trim($input, '_id');
-                    $options = (auth()->user()->$name !== null) ? auth()->user()->$name : $this->model->$name/* grab the model relation. what to do ifthere is no relation? */
-                    ;
+                    $options = (auth()->user()->$name !== null) ? auth()->user()->$name : $this->model->$name/* grab the model relation. what to do ifthere is no relation? */;
                     if (empty($options)) {
                         $model = config('kregel.warden.models.'.$name.'.model');
                         if (!empty($model)) {
@@ -90,45 +89,45 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
 
                     return $this->select([
                         'default' => 'Please select a '.trim($input, '_id').' to assign this to',
-                        'type' => 'select',
-                        'name' => $input,
+                        'type'    => 'select',
+                        'name'    => $input,
                         'v-model' => 'data.'.$input,
                         '@update' => 'updateSelect',
-                        'id' => $this->genId($input),
-                        'lazy' => '',
+                        'id'      => $this->genId($input),
+                        'lazy'    => '',
                     ], $ops);
                 }
             }
         }
         if ($type === 'select') {
             return $this->select([
-                'type' => $type,
-                'name' => $input,
+                'type'    => $type,
+                'name'    => $input,
                 'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
+                'id'      => $this->genId($input),
             ], [
                 false => 'No',
-                true => 'Yes',
+                true  => 'Yes',
             ]);
         } elseif (in_array($type, [
             'text',
         ])) {
             return $this->textarea([
-                'type' => $type,
-                'name' => $input,
+                'type'    => $type,
+                'name'    => $input,
                 'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
+                'id'      => $this->genId($input),
             ], (!empty($this->model->$input) && !(stripos($input,
                         'password') !== false)) ? $this->model->$input : '');
         } elseif ($type === 'file') {
             $label = (!empty($options['name']) ? ucwords($options['name']) : '');
             $returnable = '<div class="file-field input-field"><div class="btn"><span>Your file</span>
                 '.parent::plainInput([
-                    'type' => $type,
-                    'name' => $input,
-                    'v-el' => str_slug($input),
-                    'class' => 'validate',
-                    'id' => $this->genId($label),
+                    'type'     => $type,
+                    'name'     => $input,
+                    'v-el'     => str_slug($input),
+                    'class'    => 'validate',
+                    'id'       => $this->genId($label),
                     'multiple' => '',
                 ]).(empty($label) | (substr($label, 0,
                         1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').'
@@ -146,10 +145,10 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             'number',
         ])) {
             return $this->input([
-                'type' => $type,
-                'name' => $input,
+                'type'    => $type,
+                'name'    => $input,
                 'v-model' => 'data.'.$input,
-                'id' => $this->genId($input),
+                'id'      => $this->genId($input),
             ]);
         }
     }
@@ -162,7 +161,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      *
      * @return string
      */
-    public function select(Array $configs, Array $options)
+    public function select(array $configs, array $options)
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
@@ -184,7 +183,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      *
      * @return string
      */
-    public function textarea(Array $options, $text = '')
+    public function textarea(array $options, $text = '')
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
@@ -192,7 +191,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             <div class="input-field">
                 '.parent::plainTextarea(array_merge([
             'class' => 'materialize-textarea',
-            'id' => $this->genId($label),
+            'id'    => $this->genId($label),
         ], $options), $text).'
                 '.(empty($label) | (substr($label, 0,
                 1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
@@ -206,7 +205,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
      *
      * @return string
      */
-    public function input(Array $options)
+    public function input(array $options)
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
@@ -214,7 +213,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
         <div class="input-field">
                 '.parent::plainInput(array_merge([
             'class' => 'validate',
-            'id' => $this->genId($label),
+            'id'    => $this->genId($label),
         ], $options)).(empty($label) | (substr($label, 0,
                 1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
         </div>

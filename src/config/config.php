@@ -2,8 +2,8 @@
 
 return [
   'using' => [
-    'csrf' => true,
-    'framework' => 'bootstrap',
+    'csrf'             => true,
+    'framework'        => 'bootstrap',
     'custom-framework' => function () {
       return new Path\To\My\Framework();
     },

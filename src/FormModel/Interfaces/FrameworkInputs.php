@@ -101,7 +101,7 @@ abstract class FrameworkInputs
 
     public function method($method)
     {
-        if (!(in_array(strtolower($method), ['get', 'post']))) {
+        if (in_array(strtolower($method), ['get', 'post'])) {
             return $this->input(['type' => 'hidden', 'name' => '_method', 'value' => $method]);
         }
 

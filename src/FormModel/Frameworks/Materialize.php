@@ -2,6 +2,7 @@
 
 namespace Kregel\FormModel\Frameworks;
 
+use Illuminate\Database\Eloquent\Collection;
 use Kregel\FormModel\Interfaces\FrameworkInputs;
 use Kregel\FormModel\Interfaces\FrameworkInterface;
 
@@ -25,9 +26,9 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
         $options['method'] = $real_method;
         $options['action'] = $this->location;
 
-        return '<form '.$this->attributes($options).'>'.// Pass the method through so the form knows how to handle it's self (with laravel)
-        $this->method($method).// Check and fill the csrf token if it's configured for it.
-        $this->csrf().$this->buildForm().$this->submit(['class' => 'btn waves-effect waves-light']).'</form>';
+        return '<form ' . $this->attributes($options) . '>' .// Pass the method through so the form knows how to handle it's self (with laravel)
+        $this->method($method) .// Check and fill the csrf token if it's configured for it.
+        $this->csrf() . $this->buildForm() . $this->submit(['class' => 'btn waves-effect waves-light']) . '</form>';
     }
 
     /**
@@ -42,10 +43,10 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
         return '<div class="input-field">
-                '.(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').parent::plainSubmit(array_merge([
+                ' . (empty($label) | (substr($label, 0,
+                1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $label . '</label>') . parent::plainSubmit(array_merge([
             'class' => 'btn waves-effect waves-light pull-right',
-        ], $options)).'</div>
+        ], $options)) . '</div>
         </div>';
     }
 
@@ -70,67 +71,73 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
                 if (!empty(config('kregel.warden.models'))) {
                     // Check if Warden exists
                     $name = trim($input, '_id');
-                    $options = collect([(auth()->user()->$name !== null) ? auth()->user()->$name : $this->model->$name])/* grab the model relation. what to do ifthere is no relation? */;
+                    $options = (auth()->user()->$name !== null) ? auth()->user()->$name : $this->model->$name/* grab the model relation. what to do ifthere is no relation? */
+                    ;
                     if (empty($options)) {
-                        $model = config('kregel.warden.models.'.$name.'.model');
+                        $model = config('kregel.warden.models.' . $name . '.model');
                         if (!empty($model)) {
                             $options = $model::all();
                         }
                     }
                 } else {
-                    $options = collect([(auth()->user()->$input !== null) ? auth()->user()->$input : $this->model->$input]);
+                    $options = (auth()->user()->$input !== null) ? auth()->user()->$input : $this->model->$input;
                 }
                 $ops = [];
 
-                if (!empty($options)) {
-                    foreach ($options as $option) {
-                        $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->name));
-                    }
+                if ($options instanceof Collection)
+                    if (!$options->isEmpty()) {
+                        foreach ($options as $option) {
+                            try {
+                                $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->name));
+                            } catch (\Exception $e) {
+                                dd($options);
+                            }
+                        }
 
-                    return $this->select([
-                        'default' => 'Please select a '.trim($input, '_id').' to assign this to',
-                        'type'    => 'select',
-                        'name'    => $input,
-                        'v-model' => 'data.'.$input,
-                        '@update' => 'updateSelect',
-                        'id'      => $this->genId($input),
-                        'lazy'    => '',
-                    ], $ops);
-                }
+                        return $this->select([
+                            'default' => 'Please select a ' . trim($input, '_id') . ' to assign this to',
+                            'type' => 'select',
+                            'name' => $input,
+                            'v-model' => 'data.' . $input,
+                            '@update' => 'updateSelect',
+                            'id' => $this->genId($input),
+                            'lazy' => '',
+                        ], $ops);
+                    }
             }
         }
         if ($type === 'select') {
             return $this->select([
-                'type'    => $type,
-                'name'    => $input,
-                'v-model' => 'data.'.$input,
-                'id'      => $this->genId($input),
+                'type' => $type,
+                'name' => $input,
+                'v-model' => 'data.' . $input,
+                'id' => $this->genId($input),
             ], [
                 false => 'No',
-                true  => 'Yes',
+                true => 'Yes',
             ]);
         } elseif (in_array($type, [
             'text',
         ])) {
             return $this->textarea([
-                'type'    => $type,
-                'name'    => $input,
-                'v-model' => 'data.'.$input,
-                'id'      => $this->genId($input),
+                'type' => $type,
+                'name' => $input,
+                'v-model' => 'data.' . $input,
+                'id' => $this->genId($input),
             ], (!empty($this->model->$input) && !(stripos($input,
                         'password') !== false)) ? $this->model->$input : '');
         } elseif ($type === 'file') {
             $label = (!empty($options['name']) ? ucwords($options['name']) : '');
             $returnable = '<div class="file-field input-field"><div class="btn"><span>Your file</span>
-                '.parent::plainInput([
-                    'type'     => $type,
-                    'name'     => $input,
-                    'v-el'     => str_slug($input),
-                    'class'    => 'validate',
-                    'id'       => $this->genId($label),
+                ' . parent::plainInput([
+                    'type' => $type,
+                    'name' => $input,
+                    'v-el' => str_slug($input),
+                    'class' => 'validate',
+                    'id' => $this->genId($label),
                     'multiple' => '',
-                ]).(empty($label) | (substr($label, 0,
-                        1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').'
+                ]) . (empty($label) | (substr($label, 0,
+                        1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $label . '</label>') . '
                 </div>
                 <div class="file-path-wrapper">
                 <input class="file-path validate" type="text" placeholder="Upload one or more files">
@@ -145,10 +152,10 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             'number',
         ])) {
             return $this->input([
-                'type'    => $type,
-                'name'    => $input,
-                'v-model' => 'data.'.$input,
-                'id'      => $this->genId($input),
+                'type' => $type,
+                'name' => $input,
+                'v-model' => 'data.' . $input,
+                'id' => $this->genId($input),
             ]);
         }
     }
@@ -167,10 +174,10 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
 
         return '
         <div class="input-field">
-        '.parent::plainSelect(array_merge([
+        ' . parent::plainSelect(array_merge([
             'id' => $this->genId($label),
-        ], $configs), $options).(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$label.'">'.$this->inputToRead($label).'</label>').'
+        ], $configs), $options) . (empty($label) | (substr($label, 0,
+                1) == '_') ? '' : '<label for="' . $label . '">' . $this->inputToRead($label) . '</label>') . '
         </div>
          ';
     }
@@ -189,12 +196,12 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
 
         return '
             <div class="input-field">
-                '.parent::plainTextarea(array_merge([
+                ' . parent::plainTextarea(array_merge([
             'class' => 'materialize-textarea',
-            'id'    => $this->genId($label),
-        ], $options), $text).'
-                '.(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
+            'id' => $this->genId($label),
+        ], $options), $text) . '
+                ' . (empty($label) | (substr($label, 0,
+                1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $this->inputToRead($label) . '</label>') . '
             </div>';
     }
 
@@ -211,11 +218,11 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
 
         return '
         <div class="input-field">
-                '.parent::plainInput(array_merge([
+                ' . parent::plainInput(array_merge([
             'class' => 'validate',
-            'id'    => $this->genId($label),
-        ], $options)).(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
+            'id' => $this->genId($label),
+        ], $options)) . (empty($label) | (substr($label, 0,
+                1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $this->inputToRead($label) . '</label>') . '
         </div>
         ';
     }

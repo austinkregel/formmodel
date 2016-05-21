@@ -22,7 +22,7 @@ abstract class FrameworkInputs
     public function plainTextarea($options, $text = '')
     {
         return '<textarea'.$this->attributes($options).'>'.
-            $text.'</textarea>';
+            ( is_string($text) ? $text : collect($text)).'</textarea>';
     }
 
     /**

@@ -56,7 +56,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
      *
      * @return string (an HTML input element)
      */
-    protected function modelInput($input, $old_input = null, $edit = false)
+    public function modelInput($input, $old_input = null, $edit = false)
     {
         $type = $this->getInputType($input, $input, $edit);
         if ($type === 'select') {

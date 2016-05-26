@@ -95,7 +95,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
 
     public function select(array $configs, array $options)
     {
-        $label = (!empty($configs['name']) ? str_replace('_', ' ', ucwords(trim($configs['name'], '_id'))) : '');
+        $label = (!empty($configs['name']) ? str_replace('_', ' ', ucwords(trim($configs['name']))) : '');
 
         return '<div class="form-group row">
                 '.(empty($label) ? '' : '<div class="col-md-4 control-label text-right"><label>'.$label.'</label></div>').'<div class="col-md-6">'.parent::plainSelect($configs, $options).'

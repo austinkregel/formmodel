@@ -2,6 +2,7 @@
 
 namespace Kregel\FormModel\Frameworks;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Kregel\FormModel\Interfaces\FrameworkInputs;
 use Kregel\FormModel\Interfaces\FrameworkInterface;
@@ -85,8 +86,13 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
                         foreach ($options as $option) {
                             $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->name));
                         }
-                        $default = empty($this->model->{trim($input, '_id')}->id) ? '' : $this->model->{trim($input, '_id')}->id;
-
+                        $relation = $this->model->{trim($input, '_id')};
+                        if($relation instanceof Collection && $relation->count() === 1)
+                        {
+                            $default = $relation->first();
+                        } else {
+                            $default = empty($this->model->{trim($input, '_id')}->id) ? '' : $this->model->{trim($input, '_id')}->id;
+                        }
                         return $this->select([
                             'default_text' => 'Please select a '.trim($input, '_id').' to assign this to',
                             'default'      => empty($default) ? '' : $default,

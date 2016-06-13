@@ -56,7 +56,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
      *
      * @return string (an HTML input element)
      */
-    protected function modelInput($input, $old_input = null, $edit = false)
+    public function modelInput($input, $old_input = null, $edit = false)
     {
         $type = $this->getInputType($input, $old_input, $edit);
         if (strlen($type) > 12) {
@@ -153,13 +153,10 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
 
     public function select(array $configs, array $options)
     {
-        $label = (!empty($configs['name']) ? str_replace('_', ' ', ucwords(trim($configs['name'], '_id'))) : '');
+        $label = (!empty($configs['name']) ? str_replace('_', ' ', ucwords(trim($configs['name']))) : '');
 
         return '<div class="form-group row">
-                '.(empty($label) ? '' : '<div class="col-md-4 control-label text-right"><label>'.$label.'</label></div>').'<div class="col-md-6">'.parent::plainSelect($configs,
-            array_merge([
-                'class' => 'form-control',
-            ], $options)).'
+                '.(empty($label) ? '' : '<div class="col-md-4 control-label text-right"><label>'.$label.'</label></div>').'<div class="col-md-6">'.parent::plainSelect($configs, $options).'
         </div>
         </div>';
     }

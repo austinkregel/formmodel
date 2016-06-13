@@ -22,7 +22,7 @@ abstract class FrameworkInputs
     public function plainTextarea($options, $text = '')
     {
         return '<textarea'.$this->attributes($options).'>'.
-            $text.'</textarea>';
+            ( is_string($text) ? $text : collect($text)).'</textarea>';
     }
 
     /**
@@ -226,7 +226,7 @@ abstract class FrameworkInputs
         ) {
             return 'date';
             // Assume that the desired result is a boolean.
-        } elseif (stripos($input, 'is_') !== false) {
+        } elseif (stripos($input, 'is_') !== false || stripos($input, 'can_') !== false || stripos($input, 'has_') !== false) {
             return 'select';
             // Assume that the desired result is a passwordc.
         } elseif (stripos($input, 'password') !== false) {

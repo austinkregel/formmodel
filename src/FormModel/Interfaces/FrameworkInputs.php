@@ -25,10 +25,11 @@ abstract class FrameworkInputs
      * @var
      */
     protected $accessor;
+
     public function plainTextarea($options, $text = '')
     {
         return '<textarea'.$this->attributes($options).'>'.
-            ( is_string($text) ? $text : collect($text)).'</textarea>';
+            (is_string($text) ? $text : collect($text)).'</textarea>';
     }
 
     /**

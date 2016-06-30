@@ -2,7 +2,7 @@
 
 namespace Kregel\FormModel\Traits;
 
-class FormModel
+trait Formable
 {
     protected $form_name;
 

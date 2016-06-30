@@ -84,7 +84,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
                 if (!empty($options)) {
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
-                            $this->accessor = !empty($option->form_name) ? $option->form_model : 'name';
+                            $this->accessor = !empty($option->form_name) ? $option->form_name : 'name';
                             $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
                         }
                         $relation = $this->model->{trim($input, '_id')};
@@ -93,7 +93,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
                         } else {
                             $default = empty($this->model->{trim($input, '_id')}->id) ? '' : $this->model->{trim($input, '_id')}->id;
                         }
-
+                        dd($ops);
                         return $this->select([
                             'default_text' => 'Please select a '.trim($input, '_id').' to assign this to',
                             'default'      => empty($default) ? '' : $default,

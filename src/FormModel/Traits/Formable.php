@@ -4,8 +4,6 @@ namespace Kregel\FormModel\Traits;
 
 trait Formable
 {
-    protected $form_name;
-
     /**
      * @return mixed
      */

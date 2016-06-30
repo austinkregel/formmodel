@@ -94,6 +94,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
                         } else {
                             $default = empty($this->model->{trim($input, '_id')}->id) ? '' : $this->model->{trim($input, '_id')}->id;
                         }
+
                         return $this->select([
                             'default_text' => 'Please select a '.trim($input, '_id').' to assign this to',
                             'default'      => empty($default) ? '' : $default,

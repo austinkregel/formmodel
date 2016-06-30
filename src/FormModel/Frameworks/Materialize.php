@@ -88,7 +88,7 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
                             try {
-                                $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->name));
+                                $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$option->form_name}));
                             } catch (\Exception $e) {
                                 dd($options);
                             }

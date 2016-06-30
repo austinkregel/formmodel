@@ -84,7 +84,7 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
                 if (!empty($options)) {
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
-                            $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->name));
+                            $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$option->form_name}));
                         }
                         $relation = $this->model->{trim($input, '_id')};
                         if($relation instanceof Collection && $relation->count() === 1)

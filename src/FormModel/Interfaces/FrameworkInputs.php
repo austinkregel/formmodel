@@ -3,9 +3,11 @@
 namespace Kregel\FormModel\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
+use Kregel\FormModel\Traits\Formable;
 
 abstract class FrameworkInputs
 {
+    use Formable;
     /**
      * @var
      */

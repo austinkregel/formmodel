@@ -21,6 +21,10 @@ abstract class FrameworkInputs
      */
     protected $location;
 
+    /**
+     * @var
+     */
+    protected $accessor;
     public function plainTextarea($options, $text = '')
     {
         return '<textarea'.$this->attributes($options).'>'.

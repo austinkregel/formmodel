@@ -5,7 +5,7 @@ return [
     'csrf'             => true,
     'framework'        => 'bootstrap',
     'custom-framework' => function () {
-      return new Path\To\My\Framework();
+        return new Path\To\My\Framework();
     },
   ],
 ];

@@ -21,5 +21,4 @@ trait Formable
     {
         $this->form_name = $form_name;
     }
-
 }

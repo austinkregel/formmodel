@@ -58,7 +58,7 @@ class MaterializeVue extends Materialize
                 if (!empty($options)) {
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
-                            $this->accessor = !empty($option->form_name) ? $option->form_name : 'name';
+                            $this->accessor = !empty($option->getFormName()) ? $option->getFormName() : 'name';
                             $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
                         }
                         $default = empty($this->model->{trim($input, '_id')}->id) ? '' : $this->model->{trim($input, '_id')}->id;

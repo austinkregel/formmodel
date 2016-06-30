@@ -3,9 +3,11 @@
 namespace Kregel\FormModel\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
+use Kregel\FormModel\Traits\Formable;
 
 abstract class FrameworkInputs
 {
+    use Formable;
     /**
      * @var
      */
@@ -19,6 +21,10 @@ abstract class FrameworkInputs
      */
     protected $location;
 
+    /**
+     * @var
+     */
+    protected $accessor;
     public function plainTextarea($options, $text = '')
     {
         return '<textarea'.$this->attributes($options).'>'.

@@ -88,12 +88,12 @@ class Bootstrap extends FrameworkInputs implements FrameworkInterface
                             $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
                         }
                         $relation = $this->model->{trim($input, '_id')};
-                        if($relation instanceof Collection && $relation->count() === 1)
-                        {
+                        if ($relation instanceof Collection && $relation->count() === 1) {
                             $default = $relation->first();
                         } else {
                             $default = empty($this->model->{trim($input, '_id')}->id) ? '' : $this->model->{trim($input, '_id')}->id;
                         }
+
                         return $this->select([
                             'default_text' => 'Please select a '.trim($input, '_id').' to assign this to',
                             'default'      => empty($default) ? '' : $default,

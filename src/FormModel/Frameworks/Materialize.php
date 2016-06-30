@@ -87,9 +87,10 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
                 if ($options instanceof Collection) {
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
-                            $this->accessor = !empty($option->form_name) ? $option->form_model : 'name' ;
-                            $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));                        }
-
+                            $this->accessor = !empty($option->form_name) ? $option->form_model : 'name';
+                            $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
+                        }
+                    
                         return $this->select([
                             'default' => 'Please select a '.trim($input, '_id').' to assign this to',
                             'type'    => 'select',

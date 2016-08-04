@@ -17,6 +17,7 @@ class FormModel
                 return new Frameworks\MaterializeVue();
             default:
                 $custom_thing = config('kregel.formmodel.using.custom-framework');
+
                 return call_user_func($custom_thing);
         }
     }

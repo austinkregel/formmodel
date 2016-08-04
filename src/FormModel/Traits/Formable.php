@@ -9,9 +9,9 @@ trait Formable
      */
     public function getFormName()
     {
-	if(property_exists($this, 'form_model'))
+        if (property_exists($this, 'form_model'))
             return $this->form_name;
-        return 'name'
+        return 'name';
     }
 
     /**

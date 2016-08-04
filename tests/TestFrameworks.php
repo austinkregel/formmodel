@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: austinkregel
- * Date: 8/3/16
- * Time: 10:40 PM.
- */
 class TestFrameworks extends TestCase
 {
     public function test_can_create_new_form_model_instance()
@@ -57,7 +51,7 @@ class TestFrameworks extends TestCase
          * This anonymous class is just suppose to resemble any old model.
          * wich has a relation.
          */
-        $model = new class() extends \Illuminate\Database\Eloquent\Model {
+        $model = new class extends \Illuminate\Database\Eloquent\Model {
             protected $fillable = [
                 'name', 'project_id', 'ping_to',
             ];

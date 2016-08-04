@@ -28,8 +28,8 @@ abstract class FrameworkInputs
 
     public function plainTextarea($options, $text = '')
     {
-        return '<textarea'.$this->attributes($options).'>'.
-            (is_string($text) ? $text : collect($text)).'</textarea>';
+        return '<textarea' . $this->attributes($options) . '>' .
+        (is_string($text) ? $text : collect($text)) . '</textarea>';
     }
 
     /**
@@ -47,9 +47,9 @@ abstract class FrameworkInputs
         $attr_string = '';
         foreach ($attr as $name => $value) {
             if (is_array($value)) {
-                $attr_string .= ' '.$name.'="'.implode(' ', $value).'"';
+                $attr_string .= ' ' . $name . '="' . implode(' ', $value) . '"';
             } else {
-                $attr_string .= ' '.$name.'="'.$value.'"';
+                $attr_string .= ' ' . $name . '="' . $value . '"';
             }
         }
 
@@ -67,9 +67,9 @@ abstract class FrameworkInputs
         }
         $default_text = empty($configs['default_text']) ? '' : $configs['default_text'];
 
-        return '    <select'.$this->attributes($configs).'>'.
-        '<option value="" disabled '.(is_numeric($default) ? '' : 'selected').'>'.$default_text."</option>\n"
-        .$this->buildOptions($options, is_numeric($default) ? $default : false)."
+        return '    <select' . $this->attributes($configs) . '>' .
+        '<option value="" disabled ' . (is_numeric($default) ? '' : 'selected') . '>' . $default_text . "</option>\n"
+        . $this->buildOptions($options, is_numeric($default) ? $default : false) . "
        </select>\n";
     }
 
@@ -83,7 +83,7 @@ abstract class FrameworkInputs
                 $attr['selected'] = 'selected';
             }
             $attr['value'] = $value;
-            $return .= '                  <option'.$this->attributes($attr).'>'.$text."</option>\n";
+            $return .= '                  <option' . $this->attributes($attr) . '>' . $text . "</option>\n";
         }
 
         return $return;
@@ -101,7 +101,7 @@ abstract class FrameworkInputs
      */
     public function plainInput($options = [])
     {
-        return '<input'.$this->attributes($options).'>';
+        return '<input' . $this->attributes($options) . '>';
     }
 
     abstract public function form(array $options = []);
@@ -136,8 +136,8 @@ abstract class FrameworkInputs
              */
             if (isset($this->model->$input)) {
                 $return .= $this->modelInput($input);
-            } elseif (!empty($relations)) {
-                foreach ($relations as $relation) {
+            } elseif (!empty($this->model->getRelations())) {
+                foreach ($this->model->getRelations() as $relation) {
                     $old_input = null;
                     /*
                      * Here is where the relation magic happens. We need to see if,
@@ -151,7 +151,7 @@ abstract class FrameworkInputs
                      */
                     if (stripos($input, $relation) !== false) {
                         $old_input = $input;
-                        $input = str_replace($relation.'_', '', $input);
+                        $input = str_replace($relation . '_', '', $input);
                     }
                     /*
                     * Here we need to build the model's input field since there is
@@ -189,7 +189,7 @@ abstract class FrameworkInputs
      *
      * @param string $input
      * @param string $old_input
-     * @param bool   $edit
+     * @param bool $edit
      *
      * @throws \Exception
      *
@@ -207,7 +207,7 @@ abstract class FrameworkInputs
             stripos($input, '_id') !== false
         ) {
             if ($edit === false) {
-                return '<!-- There is a relation that requires the key '.htmlentities($input).', assuming that it will be handled later -->';
+                return '<!-- There is a relation that requires the key ' . htmlentities($input) . ', assuming that it will be handled later -->';
             } else {
                 return 'text';
             }
@@ -306,5 +306,68 @@ abstract class FrameworkInputs
     protected function genId($label)
     {
         return strtolower(preg_replace('/[-\s]+/', '_', $label));
+    }
+
+    /**
+     * This should get the realtions of the given model and
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param $desired_relation
+     * @return \Illuminate\Support\Collection|null
+     */
+    public function getRelationalDataAndModels($model, $desired_relation)
+    {
+        // $relations = $model->getRelations();
+        $desired_relation = $this->trimCommonRelationEndings($desired_relation);
+        // Grab all the model relationships that don't return as a collection
+        $singleRelations = [
+            BelongsTo::class,
+            HasOne::class,
+            MorphTo::class,
+            MorphOne::class
+        ];
+
+        // Grab all the model relationships that DO return as a collection
+        $multiRelations = [
+            HasMany::class,
+            BelongsToMany::class,
+            MorphMany::class,
+            MorphToMany::class,
+        ];
+        if (method_exists($model, $desired_relation)) {
+            $relation_class = get_class($model->$desired_relation());
+            if (in_array($relation_class, $singleRelations)) {
+                // It has a single relation so it should be collected and sent back.
+                return collect([$model->$desired_relation]);
+            } else if (in_array($relation_class, $multiRelations)) {
+                // This is already a collection so we don't have to collect anything
+                // TODO: Determine if we should have a limit function here or not...
+                return $model->$desired_relation()->limit(15)->get();
+            }
+            dd($relation_class);
+        }
+        //
+        return null;
+    }
+
+    /**
+     * @param $desired_relation
+     * @return \Illuminate\Support\Collection|null
+     */
+    public function getRelationFromLoggedInUserIfPossible($desired_relation)
+    {
+        return $this->getRelationalDataAndModels(auth()->user(), $desired_relation);
+    }
+
+    /**
+     * This will remove the common endings of relationships (like _id)
+     * @param $relation
+     * @return string
+     */
+    public function trimCommonRelationEndings($relation)
+    {
+        if (stripos($relation, '_id') !== false) {
+            return trim($relation, '_id');
+        }
+        return $relation;
     }
 }

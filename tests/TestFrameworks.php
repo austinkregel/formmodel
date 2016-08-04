@@ -51,7 +51,7 @@ class TestFrameworks extends TestCase
          * This anonymous class is just suppose to resemble any old model.
          * wich has a relation.
          */
-        $model = new class extends \Illuminate\Database\Eloquent\Model {
+        $model = new class() extends \Illuminate\Database\Eloquent\Model {
             protected $fillable = [
                 'name', 'project_id', 'ping_to',
             ];

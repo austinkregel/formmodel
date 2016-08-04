@@ -158,9 +158,9 @@ abstract class FrameworkInputs
                     * a relation on the base mode. We also need to grab the old
                     * input field and any old kind of data.
                     */
-                    if (isset($this->model->$relation->$input)) {
-                        $return .= $this->modelInput($this->model->$relation, $input, $old_input);
-                    }
+//                    if (isset($this->model->$relation->$input)) {
+//                        $return .= $this->modelInput($this->model->$relation, $input, $old_input);
+//                    }
                 }
             } else {
                 $return .= $this->modelInput($input);

@@ -36,25 +36,9 @@ class BootstrapVue extends Bootstrap
         $type = $this->getInputType($input, $old_input, $edit);
         if (strlen($type) > 12) {
             if (stripos($input, '_id') !== false) {
-                if (!empty(config('kregel.warden.models'))) {
-                    // Check if Warden exists
-                    $name = trim($input, '_id');
-                    $options = (auth()->user()->$name !== null) ? auth()->user()->$name : $this->model->$name;
-                    /* grab the model relation. what to do if there is no relation?
-  185036112                      convert it to a collection later on...*/
-                    if (empty($options)) {
-                        $model = config('kregel.warden.models.'.$name.'.model');
-                        if (!empty($model)) {
-                            $options = $model::all();
-                        }
-                    }
-                } else {
-                    $options = (auth()->user()->$input !== null) ? auth()->user()->$input : $this->model->$input;
-                }
+                $options = $this->getRelationFromLoggedInUserIfPossible($input) ?: $this->getRelationalDataAndModels($this->model, $input);
+                dd($options);
                 $ops = [];
-                if (!$options instanceof Collection && !empty($options)) {
-                    $options = collect([$options]);
-                }
                 if (!empty($options)) {
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
@@ -132,4 +116,7 @@ class BootstrapVue extends Bootstrap
             ]);
         }
     }
+
+
+    
 }

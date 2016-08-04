@@ -2,8 +2,6 @@
 
 namespace Kregel\FormModel\Frameworks;
 
-use Illuminate\Support\Collection;
-
 class BootstrapVue extends Bootstrap
 {
     public $vue_components = [];
@@ -116,7 +114,4 @@ class BootstrapVue extends Bootstrap
             ]);
         }
     }
-
-
-    
 }

@@ -11,7 +11,7 @@ trait Formable
     {
 	if(property_exists($this, 'form_model'))
             return $this->form_name;
-        return 'name'
+        return 'name';
     }
 
     /**

@@ -18,7 +18,7 @@ class BootstrapVue extends Bootstrap
     public function form(array $options = [])
     {
         $this->options = $options;
-        $this->form = parent::form(array_merge(['@submit.prevent' => 'makeRequest'], $this->options));
+        $this->form = parent::form($this->options);
 
         return view('formmodel::form_types.bootstrap-vue', [
             'form_'      => $this->form,
@@ -34,15 +34,29 @@ class BootstrapVue extends Bootstrap
         $type = $this->getInputType($input, $old_input, $edit);
         if (strlen($type) > 12) {
             if (stripos($input, '_id') !== false) {
-                $options = $this->getRelationFromLoggedInUserIfPossible($input) ?: $this->getRelationalDataAndModels($this->model, $input);
-                dd($options);
+                $options = $this->getRelationFromLoggedInUserIfPossible($input) ?? $this->getRelationalDataAndModels($this->model, $input);
                 $ops = [];
                 if (!empty($options)) {
+                dd($options);
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
-                            $this->accessor = !empty($option->getFormName()) ? $option->getFormName() : 'name';
+                            if(method_exists($option, 'getFormName'))
+                                $this->accessor = $option->getFormName();
+                            else 
+                                $this->accessor = 'name';
                             $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
                         }
+
+                        // $ops = array_map(function($option){
+                        //     if(method_exists($option, 'getFormName')){
+                        //         $accessor = $option->getFormName();
+                        //     } else {
+                        //         $accessor = 'name';
+                        //     }
+                        //     return $option->{$accessor};
+                        // }, $options);
+
+
                         $default = empty($this->model->{trim($input, '_id')}->id) ? '' : $this->model->{trim($input, '_id')}->id;
 
                         return $this->select([
@@ -51,8 +65,6 @@ class BootstrapVue extends Bootstrap
                             'type'         => 'select',
                             'class'        => 'form-control',
                             'name'         => $input,
-                            'v-model'      => 'data.'.$input,
-                            '@update'      => 'updateSelect',
                             'id'           => $this->genId($input),
                         ], $ops);
                     }
@@ -76,7 +88,6 @@ class BootstrapVue extends Bootstrap
             return $this->textarea([
                 'type'    => $type,
                 'name'    => $input,
-                'v-model' => 'data.'.$input,
                 'id'      => $this->genId($input),
             ], (!empty($this->model->$input) && !(stripos($input,
                         'password') !== false)) ? $this->model->$input : '');
@@ -109,7 +120,6 @@ class BootstrapVue extends Bootstrap
                 'type'    => $type,
                 'name'    => $input,
                 'class'   => 'form-control',
-                'v-model' => 'data.'.$input,
                 'id'      => $this->genId($input),
             ]);
         }

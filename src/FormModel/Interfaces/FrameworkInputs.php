@@ -28,8 +28,8 @@ abstract class FrameworkInputs
 
     public function plainTextarea($options, $text = '')
     {
-        return '<textarea'.$this->attributes($options).'>'.
-        (is_string($text) ? $text : collect($text)).'</textarea>';
+        return '<textarea' . $this->attributes($options) . '>' .
+        (is_string($text) ? $text : collect($text)) . '</textarea>';
     }
 
     /**
@@ -47,9 +47,9 @@ abstract class FrameworkInputs
         $attr_string = '';
         foreach ($attr as $name => $value) {
             if (is_array($value)) {
-                $attr_string .= ' '.$name.'="'.implode(' ', $value).'"';
+                $attr_string .= ' ' . $name . '="' . implode(' ', $value) . '"';
             } else {
-                $attr_string .= ' '.$name.'="'.$value.'"';
+                $attr_string .= ' ' . $name . '="' . $value . '"';
             }
         }
 
@@ -67,9 +67,9 @@ abstract class FrameworkInputs
         }
         $default_text = empty($configs['default_text']) ? '' : $configs['default_text'];
 
-        return '    <select'.$this->attributes($configs).'>'.
-        '<option value="" disabled '.(is_numeric($default) ? '' : 'selected').'>'.$default_text."</option>\n"
-        .$this->buildOptions($options, is_numeric($default) ? $default : false)."
+        return '    <select' . $this->attributes($configs) . '>' .
+        '<option value="" disabled ' . (is_numeric($default) ? '' : 'selected') . '>' . $default_text . "</option>\n"
+        . $this->buildOptions($options, is_numeric($default) ? $default : false) . "
        </select>\n";
     }
 
@@ -83,7 +83,7 @@ abstract class FrameworkInputs
                 $attr['selected'] = 'selected';
             }
             $attr['value'] = $value;
-            $return .= '                  <option'.$this->attributes($attr).'>'.$text."</option>\n";
+            $return .= '                  <option' . $this->attributes($attr) . '>' . $text . "</option>\n";
         }
 
         return $return;
@@ -101,14 +101,29 @@ abstract class FrameworkInputs
      */
     public function plainInput($options = [])
     {
-        return '<input'.$this->attributes($options).'>';
+        return '<input' . $this->attributes($options) . '>';
     }
 
-    abstract public function form(array $options = []);
+    /**
+     * @param array $options
+     * @return string|html
+     */
+    public function form(array $options = [])
+    {
+        $method = empty($options['method']) ? $options['method'] : '';
+        if (!in_array(strtolower($method), ['get', 'post'])) {
+            $options['method'] = 'POST';
+        }
+        // Throw in all the attributes meant for the form
+        return '<form ' . $this->attributes($options['form']) . '>' .
+        $this->method($options['method']) .
+        $this->buildForm() .
+        $this->submit() . '</form>';
+    }
 
     public function method($method)
     {
-        if (in_array(strtolower($method), ['get', 'post'])) {
+        if (!in_array(strtolower($method), ['get', 'post'])) {
             return $this->input(['type' => 'hidden', 'name' => '_method', 'value' => $method]);
         }
 
@@ -124,50 +139,13 @@ abstract class FrameworkInputs
         return '';
     }
 
+    protected $models = [];
+
     public function buildForm()
     {
-        $return = '';
-        $fillable = $this->getFillable($this->model);
-        foreach ($fillable as $input) {
-            /*
-             * Here we need to do a model check. We need ensure the input
-             * or desired attribute exists on the model, if it doesn't exist
-             * we will need to loop through the different relations psased through
-             */
-            if (isset($this->model->$input)) {
-                $return .= $this->modelInput($input);
-            } elseif (!empty($this->model->getRelations())) {
-                foreach ($this->model->getRelations() as $relation) {
-                    $old_input = null;
-                    /*
-                     * Here is where the relation magic happens. We need to see if,
-                     * ex. user_id exists. if it does it will replace user_ with
-                     * nothing so you'll be left with just id so then it will
-                     * get the information for that model's relation.
-                     *
-                     * So the query would actually look like
-                     * (going from the above example)
-                     * $model->user->id
-                     */
-                    if (stripos($input, $relation) !== false) {
-                        $old_input = $input;
-                        $input = str_replace($relation.'_', '', $input);
-                    }
-                    /*
-                    * Here we need to build the model's input field since there is
-                    * a relation on the base mode. We also need to grab the old
-                    * input field and any old kind of data.
-                    */
-//                    if (isset($this->model->$relation->$input)) {
-//                        $return .= $this->modelInput($this->model->$relation, $input, $old_input);
-//                    }
-                }
-            } else {
-                $return .= $this->modelInput($input);
-            }
-        }
-
-        return $return;
+        return implode('',array_map(function($input){
+            return $this->modelInput($input);
+        }, $this->getFillable($this->model)));
     }
 
     public function getFillable()
@@ -189,28 +167,58 @@ abstract class FrameworkInputs
      *
      * @param string $input
      * @param string $old_input
-     * @param bool   $edit
+     * @param bool $edit
      *
      * @throws \Exception
      *
      * @return string (an HTML form)
      */
+
     protected function modelInput($input, $old_input = null, $edit = false)
     {
-        throw new \Exception('Some thing went wrong! You must not be setting the modelInput method!');
+
+        $type = $this->getInputType($input, $old_input, $edit);
+        if ($type === 'relationship') {
+            $options = $this->getRelationalDataAndModels($this->model, $input, true) ?? $this->getRelationFromLoggedInUserIfPossible($input);
+            $ops = [];
+            if (!empty($options)) {
+                foreach ($options as $option) {
+                    if (method_exists($option, 'getFormName'))
+                        $this->accessor = $option->getFormName();
+                    else
+                        $this->accessor = 'name';
+                    $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
+                }
+
+                $desired_relation = trim($input, '_id');
+                $default = empty($this->model->$desired_relation->id) ? '' : $this->model->$desired_relation->id;
+                return $this->select([
+                    'default_text' => 'Please select a ' . $desired_relation . ' to assign this to',
+                    'default' => empty($default) ? '' : $default,
+                    'type' => 'select',
+                    'class' => 'form-control',
+                    'name' => $input,
+                ], $ops);
+            }
+        }
+        // Determine block.
+        return $this->spitOutHtmlForModelInputToConsume($type, $input);
     }
 
+    /**
+     * This function uses naming conventions to determine what a fillable attribute might be.
+     * @param $input
+     * @param null $old_input
+     * @param bool $edit
+     * @return string
+     */
     public function getInputType($input, $old_input = null, $edit = false)
     {
         $input = !empty($old_input) ? $old_input : $input;
         if (stripos($input, 'id') !== false |
             stripos($input, '_id') !== false
         ) {
-            if ($edit === false) {
-                return '<!-- There is a relation that requires the key '.htmlentities($input).', assuming that it will be handled later -->';
-            } else {
-                return 'text';
-            }
+            return 'relationship';
         } elseif (
             (stripos($input, 'number') !== false &
                 (
@@ -316,38 +324,57 @@ abstract class FrameworkInputs
      *
      * @return \Illuminate\Support\Collection|null
      */
-    public function getRelationalDataAndModels($model, $desired_relation)
+
+    public function getRelationalDataAndModels($model, $desired_relation, $debug = false)
     {
         // $relations = $model->getRelations();
         $desired_relation = $this->trimCommonRelationEndings($desired_relation);
         // Grab all the model relationships that don't return as a collection
-        $singleRelations = [
-            BelongsTo::class,
-            HasOne::class,
-            MorphTo::class,
-            MorphOne::class,
-        ];
-
-        // Grab all the model relationships that DO return as a collection
-        $multiRelations = [
-            HasMany::class,
-            BelongsToMany::class,
-            MorphMany::class,
-            MorphToMany::class,
-        ];
         if (method_exists($model, $desired_relation)) {
-            $relation_class = get_class($model->$desired_relation());
-            if (in_array($relation_class, $singleRelations)) {
-                // It has a single relation so it should be collected and sent back.
-                return collect([$model->$desired_relation]);
-            } elseif (in_array($relation_class, $multiRelations)) {
-                // This is already a collection so we don't have to collect anything
-                // TODO: Determine if we should have a limit function here or not...
-                return $model->$desired_relation()->limit(15)->get();
-            }
-            dd($relation_class);
+            return $this->getResolvedRelationship($model, $desired_relation);
+        } else if (method_exists($model, $desired_relation . 's')) {
+            return $this->getResolvedRelationship($model, $desired_relation . 's');
         }
-        //
+        // Return null because clearly, nothing matches what we need.
+        return null;
+    }
+
+    /**
+     * This will see if the desired relation is a relation.
+     * @param $model
+     * @param $desired_relation
+     * @param array $singleRelations
+     * @param array $multiRelations
+     * @return bool
+     */
+    protected function getResolvedRelationship($model, $desired_relation, $singleRelations = [
+        BelongsTo::class,
+        HasOne::class,
+        MorphTo::class,
+        MorphOne::class,
+    ], $multiRelations = [
+        HasMany::class,
+        BelongsToMany::class,
+        MorphMany::class,
+        MorphToMany::class,
+    ])
+    {
+        $relation_class = get_class($model->$desired_relation());
+        if ($this->in_array($relation_class, $singleRelations)) {
+            // It has a single relation so it should be collected and sent back.
+            return collect([$model->$desired_relation]);
+        } elseif ($this->in_array($relation_class, $multiRelations)) {
+            // This is already a collection so we don't have to collect anything
+            // TODO: Determine if we should have a limit function here or not...
+
+            return $model->$desired_relation()->limit(15)->get();
+        } else {
+            echo "{$desired_relation} is not a relation \n";
+        }
+        
+        $desired_class = get_class($model->$desired_relation()->getRelated());
+        $closure = config('kregel.formmodel.resolved_relationship');
+        return $closure($desired_class);
     }
 
     /**
@@ -375,4 +402,49 @@ abstract class FrameworkInputs
 
         return $relation;
     }
+
+    /**
+     * Check if an item is actually in an array.
+     * @param $needle
+     * @param $haystack
+     * @return bool
+     */
+    protected function in_array($needle, $haystack)
+    {
+        return count(array_filter($haystack, function ($hay) use ($needle) {
+            return $hay === $needle;
+        })) > 0;
+    }
+
+    /**
+     * This should...
+     * @param $type
+     * @param $input
+     * @return html
+     */
+    public function spitOutHtmlForModelInputToConsume($type, $input)
+    {
+        if ($type === 'select') {
+            return $this->select([
+                'default_text' => 'Please select a ' . trim($input, '_id'),
+                'type' => $type,
+                'name' => $input,
+            ], [
+                false => 'No',
+                true => 'Yes',
+            ]);
+        } elseif (in_array($type, ['password', 'email', 'date', 'number'])) {
+            return $this->input([
+                'type' => $type,
+                'name' => $input,
+                'class' => 'form-control',
+                'id' => $this->genId($input),
+            ]);
+        }
+        return $this->textarea(['type' => $type, 'name' => $input, 'id' => $this->genId($input)],
+            (!empty($this->model->$input) && !(stripos($input,
+                        'password') !== false)) ? $this->model->$input : '');
+
+    }
+
 }

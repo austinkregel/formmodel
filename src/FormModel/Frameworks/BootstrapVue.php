@@ -37,13 +37,14 @@ class BootstrapVue extends Bootstrap
                 $options = $this->getRelationFromLoggedInUserIfPossible($input) ?? $this->getRelationalDataAndModels($this->model, $input);
                 $ops = [];
                 if (!empty($options)) {
-                dd($options);
+                    dd($options);
                     if (!$options->isEmpty()) {
                         foreach ($options as $option) {
-                            if(method_exists($option, 'getFormName'))
+                            if (method_exists($option, 'getFormName')) {
                                 $this->accessor = $option->getFormName();
-                            else 
+                            } else {
                                 $this->accessor = 'name';
+                            }
                             $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
                         }
 

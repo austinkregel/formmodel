@@ -139,8 +139,6 @@ abstract class FrameworkInputs
         return '';
     }
 
-    protected $models = [];
-
     public function buildForm()
     {
         return implode('',array_map(function($input){
@@ -331,8 +329,10 @@ abstract class FrameworkInputs
         $desired_relation = $this->trimCommonRelationEndings($desired_relation);
         // Grab all the model relationships that don't return as a collection
         if (method_exists($model, $desired_relation)) {
+            // We have our relation, return it
             return $this->getResolvedRelationship($model, $desired_relation);
         } else if (method_exists($model, $desired_relation . 's')) {
+            // We have our relations, return it
             return $this->getResolvedRelationship($model, $desired_relation . 's');
         }
         // Return null because clearly, nothing matches what we need.
@@ -368,9 +368,7 @@ abstract class FrameworkInputs
             // TODO: Determine if we should have a limit function here or not...
 
             return $model->$desired_relation()->limit(15)->get();
-        } else {
-            echo "{$desired_relation} is not a relation \n";
-        }
+        } 
         
         $desired_class = get_class($model->$desired_relation()->getRelated());
         $closure = config('kregel.formmodel.resolved_relationship');

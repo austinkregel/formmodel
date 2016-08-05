@@ -333,9 +333,9 @@ abstract class FrameworkInputs
         if (method_exists($model, $desired_relation)) {
             // We have our relation, return it
             return $this->getResolvedRelationship($model, $desired_relation);
-        } else if (method_exists($model, $desired_relation . 's')) {
+        } elseif (method_exists($model, $desired_relation.'s')) {
             // We have our relations, return it
-            return $this->getResolvedRelationship($model, $desired_relation . 's');
+            return $this->getResolvedRelationship($model, $desired_relation.'s');
         } elseif (method_exists($model, $desired_relation.'s')) {
             return $this->getResolvedRelationship($model, $desired_relation.'s');
         }
@@ -373,7 +373,6 @@ abstract class FrameworkInputs
             // TODO: Determine if we should have a limit function here or not...
 
             return $model->$desired_relation()->limit(15)->get();
-
         }
         $desired_class = get_class($model->$desired_relation()->getRelated());
         $closure = config('kregel.formmodel.resolved_relationship');

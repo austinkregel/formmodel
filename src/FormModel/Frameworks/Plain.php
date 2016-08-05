@@ -1,7 +1,10 @@
 <?php
+
 namespace Kregel\FormModel\Frameworks;
-use Kregel\FormModel\Interfaces\FrameworkInterface;
+
 use Kregel\FormModel\Interfaces\FrameworkInputs;
+use Kregel\FormModel\Interfaces\FrameworkInterface;
+
 class Plain extends FrameworkInputs implements FrameworkInterface
 {
     /**
@@ -57,18 +60,17 @@ class Plain extends FrameworkInputs implements FrameworkInterface
         $this->options = $options;
         $this->form = parent::form(array_merge([
             'form' => [
-                'class' => 'form-horizontal',
+                'class'  => 'form-horizontal',
                 'action' => request()->url(),
                 'method' => 'POST',
 
-            ]
+            ],
         ], $this->options));
 
         return view('formmodel::form_types.plain', [
-            'form_' => $this->form,
+            'form_'      => $this->form,
             'components' => $this->vue_components,
-            'type' => $this->options['method'],
+            'type'       => $this->options['method'],
         ]);
     }
-
 }

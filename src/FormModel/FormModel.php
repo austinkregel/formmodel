@@ -4,7 +4,7 @@ namespace Kregel\FormModel;
 
 class FormModel
 {
-    public function using($string)
+    public static function using($string)
     {
         switch ($string) {
             case 'bootstrap':

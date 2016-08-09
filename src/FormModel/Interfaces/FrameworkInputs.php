@@ -189,8 +189,9 @@ abstract class FrameworkInputs
             $ops = [];
             if (!empty($options)) {
                 foreach ($options as $option) {
-                    if(empty($option))
+                    if (empty($option)) {
                         break;
+                    }
                     if (method_exists($option, 'getFormName')) {
                         $this->accessor = $option->getFormName();
                     } else {

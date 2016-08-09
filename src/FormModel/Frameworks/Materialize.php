@@ -2,10 +2,6 @@
 
 namespace Kregel\FormModel\Frameworks;
 
-use Illuminate\Database\Eloquent\Collection;
-use Kregel\FormModel\Interfaces\FrameworkInputs;
-use Kregel\FormModel\Interfaces\FrameworkInterface;
-
 class Materialize extends Plain
 {
     /**

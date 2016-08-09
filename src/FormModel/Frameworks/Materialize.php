@@ -2,11 +2,7 @@
 
 namespace Kregel\FormModel\Frameworks;
 
-use Illuminate\Database\Eloquent\Collection;
-use Kregel\FormModel\Interfaces\FrameworkInputs;
-use Kregel\FormModel\Interfaces\FrameworkInterface;
-
-class Materialize extends FrameworkInputs implements FrameworkInterface
+class Materialize extends Plain
 {
     /**
      * Generate the form.
@@ -48,114 +44,6 @@ class Materialize extends FrameworkInputs implements FrameworkInterface
             'class' => 'btn waves-effect waves-light pull-right',
         ], $options)).'</div>
         </div>';
-    }
-
-    /**
-     * # N/A request
-     * This will allow you to get the proper input type for an HTML form.
-     * It will extract the names from the a model.
-     *
-     * TODO: Clean up the methods. Shrink the size of this. To much for one method.
-     *
-     * @param string $input
-     * @param array  $input
-     * @param bool   $edit
-     *
-     * @return string (an HTML input element)
-     */
-    protected function modelInput($input, $old_input = null, $edit = false)
-    {
-        $type = $this->getInputType($input, $old_input, $edit);
-        if (strlen($type) > 12) {
-            if (stripos($input, '_id') !== false) {
-                if (!empty(config('kregel.warden.models'))) {
-                    // Check if Warden exists
-                    $name = trim($input, '_id');
-                    $options = (auth()->user()->$name !== null) ? auth()->user()->$name : $this->model->$name/* grab the model relation. what to do ifthere is no relation? */
-;
-                    if (empty($options)) {
-                        $model = config('kregel.warden.models.'.$name.'.model');
-                        if (!empty($model)) {
-                            $options = $model::all();
-                        }
-                    }
-                } else {
-                    $options = (auth()->user()->$input !== null) ? auth()->user()->$input : $this->model->$input;
-                }
-                $ops = [];
-
-                if ($options instanceof Collection) {
-                    if (!$options->isEmpty()) {
-                        foreach ($options as $option) {
-                            $this->accessor = !empty($option->getFormName()) ? $option->getFormName() : 'name';
-                            $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
-                        }
-
-                        return $this->select([
-                            'default' => 'Please select a '.trim($input, '_id').' to assign this to',
-                            'type'    => 'select',
-                            'name'    => $input,
-                            'v-model' => 'data.'.$input,
-                            '@update' => 'updateSelect',
-                            'id'      => $this->genId($input),
-                            'lazy'    => '',
-                        ], $ops);
-                    }
-                }
-            }
-        }
-        if ($type === 'select') {
-            return $this->select([
-                'type'    => $type,
-                'name'    => $input,
-                'v-model' => 'data.'.$input,
-                'id'      => $this->genId($input),
-            ], [
-                false => 'No',
-                true  => 'Yes',
-            ]);
-        } elseif (in_array($type, [
-            'text',
-        ])) {
-            return $this->textarea([
-                'type'    => $type,
-                'name'    => $input,
-                'v-model' => 'data.'.$input,
-                'id'      => $this->genId($input),
-            ], (!empty($this->model->$input) && !(stripos($input,
-                        'password') !== false)) ? $this->model->$input : '');
-        } elseif ($type === 'file') {
-            $label = (!empty($options['name']) ? ucwords($options['name']) : '');
-            $returnable = '<div class="file-field input-field"><div class="btn"><span>Your file</span>
-                '.parent::plainInput([
-                    'type'     => $type,
-                    'name'     => $input,
-                    'v-el'     => str_slug($input),
-                    'class'    => 'validate',
-                    'id'       => $this->genId($label),
-                    'multiple' => '',
-                ]).(empty($label) | (substr($label, 0,
-                        1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').'
-                </div>
-                <div class="file-path-wrapper">
-                <input class="file-path validate" type="text" placeholder="Upload one or more files">
-              </div>
-            </div>';
-
-            return $returnable;
-        } elseif (in_array($type, [
-            'password',
-            'email',
-            'date',
-            'number',
-        ])) {
-            return $this->input([
-                'type'    => $type,
-                'name'    => $input,
-                'v-model' => 'data.'.$input,
-                'id'      => $this->genId($input),
-            ]);
-        }
     }
 
     /**

@@ -9,13 +9,18 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/support": ">=5.0.0"
+        "php": ">=5.4.0"
     },
     "autoload": {
         "psr-4": {
             "Kregel\\FormModel\\": "src/FormModel"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^5.4",
+        "illuminate/database": ">=5.0.0",
+        "mockery/mockery": "^0.9.5"
+
+    }
 }

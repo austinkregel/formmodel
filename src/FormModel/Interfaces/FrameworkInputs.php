@@ -3,6 +3,14 @@
 namespace Kregel\FormModel\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Kregel\FormModel\Traits\Formable;
 
 abstract class FrameworkInputs
@@ -24,7 +32,7 @@ abstract class FrameworkInputs
     /**
      * @var
      */
-    protected $accessor;
+    protected $accessor = 'name';
 
     public function plainTextarea($options, $text = '')
     {
@@ -176,10 +184,13 @@ abstract class FrameworkInputs
     {
         $type = $this->getInputType($input, $old_input, $edit);
         if ($type === 'relationship') {
-            $options = $this->getRelationalDataAndModels($this->model, $input, true) ?? $this->getRelationFromLoggedInUserIfPossible($input);
+            $model_related_relations = $this->getRelationalDataAndModels($this->model, $input);
+            $options = !empty($model_related_relations) ? $model_related_relations : $this->getRelationFromLoggedInUserIfPossible($input);
             $ops = [];
             if (!empty($options)) {
                 foreach ($options as $option) {
+                    if(empty($option))
+                        break;
                     if (method_exists($option, 'getFormName')) {
                         $this->accessor = $option->getFormName();
                     } else {
@@ -325,7 +336,7 @@ abstract class FrameworkInputs
      *
      * @return \Illuminate\Support\Collection|null
      */
-    public function getRelationalDataAndModels($model, $desired_relation, $debug = false)
+    public function getRelationalDataAndModels($model, $desired_relation)
     {
         // $relations = $model->getRelations();
         $desired_relation = $this->trimCommonRelationEndings($desired_relation);
@@ -336,9 +347,9 @@ abstract class FrameworkInputs
         } elseif (method_exists($model, $desired_relation.'s')) {
             // We have our relations, return it
             return $this->getResolvedRelationship($model, $desired_relation.'s');
-        } elseif (method_exists($model, $desired_relation.'s')) {
-            return $this->getResolvedRelationship($model, $desired_relation.'s');
-        }
+        } //elseif (method_exists($model, $desired_relation.'s')) {
+//            return $this->getResolvedRelationship($model, $desired_relation.'s');
+//        }
         // Return null because clearly, nothing matches what we need.
     }
 
@@ -372,8 +383,9 @@ abstract class FrameworkInputs
             // This is already a collection so we don't have to collect anything
             // TODO: Determine if we should have a limit function here or not...
 
-            return $model->$desired_relation()->limit(15)->get();
+            return $model->$desired_relation;
         }
+
         $desired_class = get_class($model->$desired_relation()->getRelated());
         $closure = config('kregel.formmodel.resolved_relationship');
 

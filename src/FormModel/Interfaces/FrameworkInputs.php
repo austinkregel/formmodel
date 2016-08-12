@@ -132,11 +132,12 @@ abstract class FrameworkInputs
 
     public function method($method)
     {
-        if($method !== '' && $method !== null) {
+        if ($method !== '' && $method !== null) {
             if (!in_array(strtolower($method), ['get', 'post'])) {
                 return $this->input(['type' => 'hidden', 'name' => '_method', 'value' => $method]);
             }
         }
+
         return '';
     }
 
@@ -158,8 +159,10 @@ abstract class FrameworkInputs
 
     public function getFillable($model = null)
     {
-        if($model === null)
+        if ($model === null) {
             return empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
+        }
+
         return empty($model->getVisible()) ? $model->getFillable() : $model->getVisible();
     }
 
@@ -390,10 +393,11 @@ abstract class FrameworkInputs
             // TODO: Determine if we should have a limit function here or not...
 
             return $model->$desired_relation;
-        } elseif(method_exists($model->$desired_relation(), 'getRelated')) {
+        } elseif (method_exists($model->$desired_relation(), 'getRelated')) {
             // The modelhas the realtion
             $desired_class = get_class($model->$desired_relation()->getRelated());
             $closure = config('kregel.formmodel.resolved_relationship');
+
             return $closure($desired_class);
         }
 

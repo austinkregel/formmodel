@@ -75,10 +75,10 @@ abstract class FrameworkInputs
         }
         $default_text = empty($configs['default_text']) ? '' : $configs['default_text'];
 
-        return '    <select'.$this->attributes($configs).'>'.
+        return '<select'.$this->attributes($configs).'>'.
         '<option value="" disabled '.(is_numeric($default) ? '' : 'selected').'>'.$default_text."</option>\n"
-        .$this->buildOptions($options, is_numeric($default) ? $default : false)."
-       </select>\n";
+        .$this->buildOptions($options, is_numeric($default) ? $default : false).
+        "</select>\n";
     }
 
     public function buildOptions($options, $hasDefault = false)
@@ -91,7 +91,7 @@ abstract class FrameworkInputs
                 $attr['selected'] = 'selected';
             }
             $attr['value'] = $value;
-            $return .= '                  <option'.$this->attributes($attr).'>'.$text."</option>\n";
+            $return .= '<option'.$this->attributes($attr).'>'.$text."</option>\n";
         }
 
         return $return;
@@ -132,10 +132,11 @@ abstract class FrameworkInputs
 
     public function method($method)
     {
-        if (!in_array(strtolower($method), ['get', 'post'])) {
-            return $this->input(['type' => 'hidden', 'name' => '_method', 'value' => $method]);
+        if($method !== '' && $method !== null) {
+            if (!in_array(strtolower($method), ['get', 'post'])) {
+                return $this->input(['type' => 'hidden', 'name' => '_method', 'value' => $method]);
+            }
         }
-
         return '';
     }
 
@@ -152,12 +153,14 @@ abstract class FrameworkInputs
     {
         return implode('', array_map(function ($input) {
             return $this->modelInput($input);
-        }, $this->getFillable($this->model)));
+        }, $this->getFillable()));
     }
 
-    public function getFillable()
+    public function getFillable($model = null)
     {
-        return empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
+        if($model === null)
+            return empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
+        return empty($model->getVisible()) ? $model->getFillable() : $model->getVisible();
     }
 
     /**
@@ -183,9 +186,11 @@ abstract class FrameworkInputs
     protected function modelInput($input, $old_input = null, $edit = false)
     {
         $type = $this->getInputType($input, $old_input, $edit);
+
         if ($type === 'relationship') {
             $model_related_relations = $this->getRelationalDataAndModels($this->model, $input);
             $options = !empty($model_related_relations) ? $model_related_relations : $this->getRelationFromLoggedInUserIfPossible($input);
+
             $ops = [];
             if (!empty($options)) {
                 foreach ($options as $option) {
@@ -351,7 +356,7 @@ abstract class FrameworkInputs
         } //elseif (method_exists($model, $desired_relation.'s')) {
 //            return $this->getResolvedRelationship($model, $desired_relation.'s');
 //        }
-        // Return null because clearly, nothing matches what we need.
+        // don't return because clearly, nothing matches what we need.
     }
 
     /**
@@ -385,12 +390,14 @@ abstract class FrameworkInputs
             // TODO: Determine if we should have a limit function here or not...
 
             return $model->$desired_relation;
+        } elseif(method_exists($model->$desired_relation(), 'getRelated')) {
+            // The modelhas the realtion
+            $desired_class = get_class($model->$desired_relation()->getRelated());
+            $closure = config('kregel.formmodel.resolved_relationship');
+            return $closure($desired_class);
         }
 
-        $desired_class = get_class($model->$desired_relation()->getRelated());
-        $closure = config('kregel.formmodel.resolved_relationship');
-
-        return $closure($desired_class);
+        return collect([]);
     }
 
     /**

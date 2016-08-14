@@ -15,6 +15,7 @@ class FormModel
                 return new Frameworks\Plain();
             default:
                 $custom_thing = config('kregel.formmodel.using.custom-framework');
+
                 return call_user_func($custom_thing);
         }
     }

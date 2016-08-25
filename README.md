@@ -1,3 +1,22 @@
+#### Config file
+
+```php
+    /*
+     * @param String
+     * @return Collection
+     */
+    'resolved_relationship' => function ($class_name) {
+        return $class_name::limit(15)->get();
+    },
+```
+
+What this code does, is,  if there is a relationship, but it will return the resolved relationship function's evaluation. So if you want to scope this down some, then be my guest.
+
+#### Custom frameworks.
+The next step is to change the way your framework interacts with the modelInput method. There is a new "base" framework impementation, which draws from something only some classes had which is the automatic relationship resolution. If you extend the Plain framework then you will be able to use this feature by default. Other wise you can keep doing what you're doing :)
+
+If you need custom attributes on your form inputs like `v-models` (for [vue](https://vuejs.com)) or some other javascript framework or you want to add custom classes, It's recommended that your framework only contain methods that relate to the inputs for that framework, and to not have them override the default `modelInputs` method
+
 ## Oh crap! an update broke my App!! WHAT DO I DOOO!? FIX IT NOW!!
 
 Please, before you raise a lynch mob on Twitter, use your brain and the wonderful human powers of deductive reasoning.

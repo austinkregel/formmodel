@@ -36,8 +36,8 @@ abstract class FrameworkInputs
 
     public function plainTextarea($options, $text = '')
     {
-        return '<textarea'.$this->attributes($options).'>'.
-        (is_string($text) ? $text : collect($text)).'</textarea>';
+        return '<textarea' . $this->attributes($options) . '>' .
+        (is_string($text) ? $text : collect($text)) . '</textarea>';
     }
 
     /**
@@ -55,9 +55,9 @@ abstract class FrameworkInputs
         $attr_string = '';
         foreach ($attr as $name => $value) {
             if (is_array($value)) {
-                $attr_string .= ' '.$name.'="'.implode(' ', $value).'"';
+                $attr_string .= ' ' . $name . '="' . implode(' ', $value) . '"';
             } else {
-                $attr_string .= ' '.$name.'="'.$value.'"';
+                $attr_string .= ' ' . $name . '="' . $value . '"';
             }
         }
 
@@ -75,9 +75,9 @@ abstract class FrameworkInputs
         }
         $default_text = empty($configs['default_text']) ? '' : $configs['default_text'];
 
-        return '<select'.$this->attributes($configs).'>'.
-        '<option value="" disabled '.(is_numeric($default) ? '' : 'selected').'>'.$default_text."</option>\n"
-        .$this->buildOptions($options, is_numeric($default) ? $default : false).
+        return '<select' . $this->attributes($configs) . '>' .
+        '<option value="" disabled ' . (is_numeric($default) ? '' : 'selected') . '>' . $default_text . "</option>\n"
+        . $this->buildOptions($options, is_numeric($default) ? $default : false) .
         "</select>\n";
     }
 
@@ -91,7 +91,7 @@ abstract class FrameworkInputs
                 $attr['selected'] = 'selected';
             }
             $attr['value'] = $value;
-            $return .= '<option'.$this->attributes($attr).'>'.$text."</option>\n";
+            $return .= '<option' . $this->attributes($attr) . '>' . $text . "</option>\n";
         }
 
         return $return;
@@ -109,7 +109,7 @@ abstract class FrameworkInputs
      */
     public function plainInput($options = [])
     {
-        return '<input'.$this->attributes($options).'>';
+        return '<input' . $this->attributes($options) . '>';
     }
 
     /**
@@ -124,10 +124,10 @@ abstract class FrameworkInputs
             $options['method'] = 'POST';
         }
         // Throw in all the attributes meant for the form
-        return '<form '.$this->attributes($options['form']).'>'.
-        $this->method($options['method']).
-        $this->buildForm().
-        $this->submit().'</form>';
+        return '<form ' . $this->attributes($options['form']) . '>' .
+        $this->method($options['method']) .
+        $this->buildForm() .
+        $this->submit() . '</form>';
     }
 
     public function method($method)
@@ -152,18 +152,18 @@ abstract class FrameworkInputs
 
     public function buildForm()
     {
-        return implode('', array_map(function ($input) {
+        return $this->getFillable()->map(function ($input) {
             return $this->modelInput($input);
-        }, $this->getFillable()));
+        })->implode('');
     }
 
     public function getFillable($model = null)
     {
         if ($model === null) {
-            return empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible();
+            return collect(empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible());
         }
 
-        return empty($model->getVisible()) ? $model->getFillable() : $model->getVisible();
+        return collect(empty($model->getVisible()) ? $model->getFillable() : $model->getVisible());
     }
 
     /**
@@ -180,7 +180,7 @@ abstract class FrameworkInputs
      *
      * @param string $input
      * @param string $old_input
-     * @param bool   $edit
+     * @param bool $edit
      *
      * @throws \Exception
      *
@@ -193,7 +193,6 @@ abstract class FrameworkInputs
         if ($type === 'relationship') {
             $model_related_relations = $this->getRelationalDataAndModels($this->model, $input);
             $options = !empty($model_related_relations) ? $model_related_relations : $this->getRelationFromLoggedInUserIfPossible($input);
-
             $ops = [];
             if (!empty($options)) {
                 foreach ($options as $option) {
@@ -202,22 +201,29 @@ abstract class FrameworkInputs
                     }
                     if (method_exists($option, 'getFormName')) {
                         $this->accessor = $option->getFormName();
-                    } else {
-                        $this->accessor = 'name';
                     }
                     $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
                 }
 
                 $desired_relation = trim($input, '_id');
                 $default = empty($this->model->$desired_relation->id) ? '' : $this->model->$desired_relation->id;
-
+                if (!empty($default)) {
+                    return $this->select([
+                        'default_text' => 'Please select a ' . $desired_relation . ' to assign this to',
+                        'default' => empty($default) ? '' : $default,
+                        'type' => 'select',
+                        'class' => 'form-control',
+                        'name' => $input,
+                    ], $ops);
+                }
+            } else {
                 return $this->select([
-                    'default_text' => 'Please select a '.$desired_relation.' to assign this to',
-                    'default'      => empty($default) ? '' : $default,
-                    'type'         => 'select',
-                    'class'        => 'form-control',
-                    'name'         => $input,
-                ], $ops);
+                    'default_text' => 'Please select a ' . $input . ' to assign this to',
+                    'default' => empty($default) ? '' : $default,
+                    'type' => 'select',
+                    'class' => 'form-control',
+                    'name' => $input,
+                ], $options);
             }
         }
         // Determine block.
@@ -348,17 +354,17 @@ abstract class FrameworkInputs
     public function getRelationalDataAndModels($model, $desired_relation)
     {
         // $relations = $model->getRelations();
-        $desired_relation = $this->trimCommonRelationEndings($desired_relation);
+        $relation = $this->trimCommonRelationEndings($desired_relation);
         // Grab all the model relationships that don't return as a collection
-        if (method_exists($model, $desired_relation)) {
+        if (method_exists($model, $relation)) {
             // We have our relation, return it
-            return $this->getResolvedRelationship($model, $desired_relation);
-        } elseif (method_exists($model, $desired_relation.'s')) {
+            return $this->getResolvedRelationship($model, $relation);
+        } elseif (method_exists($model, $relation . 's')) {
             // We have our relations, return it
-            return $this->getResolvedRelationship($model, $desired_relation.'s');
-        } //elseif (method_exists($model, $desired_relation.'s')) {
-//            return $this->getResolvedRelationship($model, $desired_relation.'s');
-//        }
+            return $this->getResolvedRelationship($model, $relation . 's');
+        } elseif (method_exists($model, $relation . 's')) {
+            return $this->getResolvedRelationship($model, $relation . 's');
+        }
         // don't return because clearly, nothing matches what we need.
     }
 
@@ -391,16 +397,14 @@ abstract class FrameworkInputs
         } elseif ($this->in_array($relation_class, $multiRelations)) {
             // This is already a collection so we don't have to collect anything
             // TODO: Determine if we should have a limit function here or not...
-
             return $model->$desired_relation;
         } elseif (method_exists($model->$desired_relation(), 'getRelated')) {
             // The modelhas the realtion
             $desired_class = get_class($model->$desired_relation()->getRelated());
             $closure = config('kregel.formmodel.resolved_relationship');
-
+            if(!empty($desired_class))
             return $closure($desired_class);
         }
-
         return collect([]);
     }
 
@@ -457,19 +461,19 @@ abstract class FrameworkInputs
     {
         if ($type === 'select') {
             return $this->select([
-                'default_text' => 'Please select a '.trim($input, '_id'),
-                'type'         => $type,
-                'name'         => $input,
+                'default_text' => 'Please select a ' . trim($input, '_id'),
+                'type' => $type,
+                'name' => $input,
             ], [
                 false => 'No',
-                true  => 'Yes',
+                true => 'Yes',
             ]);
         } elseif (in_array($type, ['password', 'email', 'date', 'number'])) {
             return $this->input([
-                'type'  => $type,
-                'name'  => $input,
+                'type' => $type,
+                'name' => $input,
                 'class' => 'form-control',
-                'id'    => $this->genId($input),
+                'id' => $this->genId($input),
             ]);
         }
 

@@ -153,7 +153,7 @@ abstract class FrameworkInputs
     public function buildForm()
     {
         return $this->getFillable()->map(function ($input) {
-            return $this->modelInput($input);
+            return ($input);
         })->implode('');
     }
 
@@ -402,9 +402,9 @@ abstract class FrameworkInputs
             // The modelhas the realtion
             $desired_class = get_class($model->$desired_relation()->getRelated());
             $closure = config('kregel.formmodel.resolved_relationship');
-            if (!empty($desired_class)) {
+//            if (!empty($desired_class)) {
                 return $closure($desired_class);
-            }
+//            }
         }
 
         return collect([]);

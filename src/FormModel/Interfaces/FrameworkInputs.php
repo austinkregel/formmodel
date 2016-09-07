@@ -153,7 +153,7 @@ abstract class FrameworkInputs
     public function buildForm()
     {
         return $this->getFillable()->map(function ($input) {
-            return ($input);
+            return $input;
         })->implode('');
     }
 

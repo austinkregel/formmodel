@@ -25,7 +25,7 @@ interface FrameworkInterface
      *
      * @return mixed
      */
-    public function select(array $configs, array $options);
+    public function select(array $configs, $options);
 
     /**
      * @param array $options

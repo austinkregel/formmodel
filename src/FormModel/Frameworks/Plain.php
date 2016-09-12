@@ -34,7 +34,7 @@ class Plain extends FrameworkInputs implements FrameworkInterface
      *
      * @return mixed
      */
-    public function select(array $configs, array $options)
+    public function select(array $configs, $options)
     {
         return parent::plainSelect($configs, $options);
     }

@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
+use Kregel\FormModel\FormModel;
 use Kregel\FormModel\Traits\Formable;
 
 abstract class FrameworkInputs
@@ -72,6 +74,10 @@ abstract class FrameworkInputs
             unset($configs['default']);
         } else {
             $default = ' ';
+        }
+        if(empty($options))
+        {
+            return '<i>No data passed for this attribute</i>';
         }
         $default_text = empty($configs['default_text']) ? '' : $configs['default_text'];
 
@@ -152,18 +158,27 @@ abstract class FrameworkInputs
 
     public function buildForm()
     {
-        return $this->getFillable()->map(function ($input) {
-            return $input;
+        $relationsInput = $this->getFillable($this->model)->filter(function($input){
+            return method_exists($this->model, $input);
+;        })->map(function($input){
+            return $this->modelInput($input);
         })->implode('');
+        $normalInput = $this->getFillable($this->model)->filter(function($input){
+            return !empty($input);
+        })->map(function($input){
+            return $this->modelInput($input);
+        })->implode('');
+
+        return $normalInput.$relationsInput;
     }
 
     public function getFillable($model = null)
     {
         if ($model === null) {
-            return collect(empty($this->model->getVisible()) ? $this->model->getFillable() : $this->model->getVisible());
+            $model = $this->model;
         }
-
-        return collect(empty($model->getVisible()) ? $model->getFillable() : $model->getVisible());
+        $fillables = collect(empty($model->getVisible()) ? $model->getFillable() : $model->getVisible());
+        return $fillables->diff($model->getHidden());
     }
 
     /**
@@ -192,39 +207,50 @@ abstract class FrameworkInputs
 
         if ($type === 'relationship') {
             $model_related_relations = $this->getRelationalDataAndModels($this->model, $input);
-            $options = !empty($model_related_relations) ? $model_related_relations : $this->getRelationFromLoggedInUserIfPossible($input);
+            $options = (!empty($model_related_relations) ? $model_related_relations : $this->getRelationFromLoggedInUserIfPossible($input));
             $ops = [];
             if (!empty($options)) {
-                foreach ($options as $option) {
-                    if (empty($option)) {
-                        break;
-                    }
-                    if (method_exists($option, 'getFormName')) {
-                        $this->accessor = $option->getFormName();
-                    }
-                    $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
-                }
+                $options = $options->filter(function ($input) {
+                    return isset($input);
+                });
+                if (!$options->isEmpty()) {
 
-                $desired_relation = trim($input, '_id');
-                $default = empty($this->model->$desired_relation->id) ? '' : $this->model->$desired_relation->id;
-                if (!empty($default)) {
-                    return $this->select([
-                        'default_text' => 'Please select a '.$desired_relation.' to assign this to',
-                        'default'      => empty($default) ? '' : $default,
-                        'type'         => 'select',
-                        'class'        => 'form-control',
-                        'name'         => $input,
-                    ], $ops);
+                    foreach ($options as $option) {
+                        if (method_exists($option, 'getFormName')) {
+                            $this->accessor = $option->getFormName();
+                        }
+
+                        try {
+                            $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
+                        } catch(\Exception $e){
+                            dd($options, $ops, $option, $this->accessor);
+                        }
+                    }
+
+                    $desired_relation = trim($input, '_id');
+                    $default = empty($this->model->$desired_relation->id) ? '' : $this->model->$desired_relation->id;
+                    if (!empty($default)) {
+                        return $this->select([
+                            'default_text' => 'Please select a ' . $desired_relation . ' to assign this to',
+                            'default' => empty($default) ? '' : $default,
+                            'type' => 'select',
+                            'class' => 'form-control',
+                            'name' => $input,
+                        ], $ops);
+                    }
                 }
-            } else {
-                return $this->select([
-                    'default_text' => 'Please select a '.$input.' to assign this to',
-                    'default'      => empty($default) ? '' : $default,
-                    'type'         => 'select',
-                    'class'        => 'form-control',
-                    'name'         => $input,
-                ], $options);
             }
+            // By Default grab the reation fro mthe config
+            $closure = config('kregel.formmodel.resolved_relationship');
+
+            return $this->select([
+                'default_text' => 'Please select a ' . $input . ' to assign this to',
+                'default' => empty($default) ? '' : $default,
+                'type' => 'select',
+                'class' => 'form-control',
+                'name' => $input,
+            ], $closure(get_class($this->model), $this->trimCommonRelationEndings($input)));
+
         }
         // Determine block.
         return $this->spitOutHtmlForModelInputToConsume($type, $input);
@@ -242,8 +268,9 @@ abstract class FrameworkInputs
     public function getInputType($input, $old_input = null, $edit = false)
     {
         $input = !empty($old_input) ? $old_input : $input;
-        if (stripos($input, 'id') !== false |
-            stripos($input, '_id') !== false
+        if ((stripos($input, 'id') !== false |
+            stripos($input, '_id') !== false) &
+            stripos($input, 'uuid') === false
         ) {
             return 'relationship';
         } elseif (
@@ -402,9 +429,9 @@ abstract class FrameworkInputs
             // The modelhas the realtion
             $desired_class = get_class($model->$desired_relation()->getRelated());
             $closure = config('kregel.formmodel.resolved_relationship');
-//            if (!empty($desired_class)) {
+            if (!empty($desired_class)) {
                 return $closure($desired_class);
-//            }
+            }
         }
 
         return collect([]);

@@ -39,7 +39,7 @@ class Bootstrap extends Plain
         </div>';
     }
 
-    public function select(array $configs, array $options)
+    public function select(array $configs, $options)
     {
         $label = (!empty($configs['name']) ? str_replace('_', ' ', ucwords(trim($configs['name']))) : '');
 
@@ -68,7 +68,7 @@ class Bootstrap extends Plain
 
         return '<div class="form-group row">
                 '.(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label class="col-md-4 control-label text-right" style="padding:8px 0;margin:0;">'.$label.'</label>').'<div class="col-md-6">'.parent::plainInput(array_merge([
+                1) == '_') ? '' : '<label class="col-md-4 control-label text-right">'.$label.'</label>').'<div class="col-md-6">'.parent::plainInput(array_merge([
             'class' => 'form-control',
         ], $options)).'</div>
         </div>';

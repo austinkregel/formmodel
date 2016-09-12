@@ -75,8 +75,7 @@ abstract class FrameworkInputs
         } else {
             $default = ' ';
         }
-        if(empty($options))
-        {
+        if (empty($options)) {
             return '<i>No data passed for this attribute</i>';
         }
         $default_text = empty($configs['default_text']) ? '' : $configs['default_text'];
@@ -158,14 +157,14 @@ abstract class FrameworkInputs
 
     public function buildForm()
     {
-        $relationsInput = $this->getFillable($this->model)->filter(function($input){
+        $relationsInput = $this->getFillable($this->model)->filter(function ($input) {
             return method_exists($this->model, $input);
-;        })->map(function($input){
+        })->map(function ($input) {
             return $this->modelInput($input);
         })->implode('');
-        $normalInput = $this->getFillable($this->model)->filter(function($input){
+        $normalInput = $this->getFillable($this->model)->filter(function ($input) {
             return !empty($input);
-        })->map(function($input){
+        })->map(function ($input) {
             return $this->modelInput($input);
         })->implode('');
 
@@ -178,6 +177,7 @@ abstract class FrameworkInputs
             $model = $this->model;
         }
         $fillables = collect(empty($model->getVisible()) ? $model->getFillable() : $model->getVisible());
+
         return $fillables->diff($model->getHidden());
     }
 
@@ -214,7 +214,6 @@ abstract class FrameworkInputs
                     return isset($input);
                 });
                 if (!$options->isEmpty()) {
-
                     foreach ($options as $option) {
                         if (method_exists($option, 'getFormName')) {
                             $this->accessor = $option->getFormName();
@@ -222,7 +221,7 @@ abstract class FrameworkInputs
 
                         try {
                             $ops[$option->id] = ucwords(preg_replace('/[-_]+/', ' ', $option->{$this->accessor}));
-                        } catch(\Exception $e){
+                        } catch (\Exception $e) {
                             dd($options, $ops, $option, $this->accessor);
                         }
                     }
@@ -231,11 +230,11 @@ abstract class FrameworkInputs
                     $default = empty($this->model->$desired_relation->id) ? '' : $this->model->$desired_relation->id;
                     if (!empty($default)) {
                         return $this->select([
-                            'default_text' => 'Please select a ' . $desired_relation . ' to assign this to',
-                            'default' => empty($default) ? '' : $default,
-                            'type' => 'select',
-                            'class' => 'form-control',
-                            'name' => $input,
+                            'default_text' => 'Please select a '.$desired_relation.' to assign this to',
+                            'default'      => empty($default) ? '' : $default,
+                            'type'         => 'select',
+                            'class'        => 'form-control',
+                            'name'         => $input,
                         ], $ops);
                     }
                 }
@@ -244,13 +243,12 @@ abstract class FrameworkInputs
             $closure = config('kregel.formmodel.resolved_relationship');
 
             return $this->select([
-                'default_text' => 'Please select a ' . $input . ' to assign this to',
-                'default' => empty($default) ? '' : $default,
-                'type' => 'select',
-                'class' => 'form-control',
-                'name' => $input,
+                'default_text' => 'Please select a '.$input.' to assign this to',
+                'default'      => empty($default) ? '' : $default,
+                'type'         => 'select',
+                'class'        => 'form-control',
+                'name'         => $input,
             ], $closure(get_class($this->model), $this->trimCommonRelationEndings($input)));
-
         }
         // Determine block.
         return $this->spitOutHtmlForModelInputToConsume($type, $input);

@@ -50,11 +50,11 @@ class Materialize extends Plain
      * Generate a select.
      *
      * @param array $configs
-     * @param array $options
+     * @param mixed $options
      *
      * @return string
      */
-    public function select(array $configs, array $options)
+    public function select(array $configs, $options)
     {
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 

@@ -495,7 +495,7 @@ abstract class FrameworkInputs
                 false => 'No',
                 true  => 'Yes',
             ]);
-        } elseif (in_array($type, ['password', 'email', 'date', 'number'])) {
+        } elseif (in_array($type, ['text', 'file', 'password', 'email', 'date', 'number'])) {
             return $this->input([
                 'type'  => $type,
                 'name'  => $input,

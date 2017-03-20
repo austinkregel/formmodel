@@ -22,9 +22,9 @@ class Materialize extends Plain
         $options['method'] = $real_method;
         $options['action'] = $this->location;
 
-        return '<form '.$this->attributes($options).'>'.// Pass the method through so the form knows how to handle it's self (with laravel)
-        $this->method($method).// Check and fill the csrf token if it's configured for it.
-        $this->csrf().$this->buildForm().$this->submit(['class' => 'btn waves-effect waves-light']).'</form>';
+        return '<form ' . $this->attributes($options) . '>' .// Pass the method through so the form knows how to handle it's self (with laravel)
+            $this->method($method) .// Check and fill the csrf token if it's configured for it.
+            $this->csrf() . $this->buildForm() . $this->submit(['class' => 'btn waves-effect waves-light']) . '</form>';
     }
 
     /**
@@ -39,10 +39,10 @@ class Materialize extends Plain
         $label = (!empty($options['name']) ? ucwords($options['name']) : '');
 
         return '<div class="input-field">
-                '.(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$label.'</label>').parent::plainSubmit(array_merge([
-            'class' => 'btn waves-effect waves-light pull-right',
-        ], $options)).'</div>
+                ' . (empty($label) | (substr($label, 0,
+                    1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $label . '</label>') . parent::plainSubmit(array_merge([
+                'class' => 'btn waves-effect waves-light pull-right',
+            ], $options)) . '</div>
         </div>';
     }
 
@@ -60,10 +60,10 @@ class Materialize extends Plain
 
         return '
         <div class="input-field">
-        '.parent::plainSelect(array_merge([
-            'id' => $this->genId($label),
-        ], $configs), $options).(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$label.'">'.$this->inputToRead($label).'</label>').'
+        ' . parent::plainSelect(array_merge([
+                'id' => $this->genId($label),
+            ], $configs), $options) . (empty($label) | (substr($label, 0,
+                    1) == '_') ? '' : '<label for="' . $label . '">' . $this->inputToRead($label) . '</label>') . '
         </div>
          ';
     }
@@ -71,7 +71,7 @@ class Materialize extends Plain
     /**
      * Generate a textarea.
      *
-     * @param array  $options
+     * @param array $options
      * @param string $text
      *
      * @return string
@@ -82,12 +82,12 @@ class Materialize extends Plain
 
         return '
             <div class="input-field">
-                '.parent::plainTextarea(array_merge([
-            'class' => 'materialize-textarea',
-            'id'    => $this->genId($label),
-        ], $options), $text).'
-                '.(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
+                ' . parent::plainTextarea(array_merge([
+                'class' => 'materialize-textarea',
+                'id' => $this->genId($label),
+            ], $options), $text) . '
+                ' . (empty($label) | (substr($label, 0,
+                    1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $this->inputToRead($label) . '</label>') . '
             </div>';
     }
 
@@ -104,12 +104,11 @@ class Materialize extends Plain
 
         return '
         <div class="input-field">
-                '.parent::plainInput(array_merge([
-            'class' => 'validate',
-            'id'    => $this->genId($label),
-            'value' => method_exists($this->model, $label) && in_array($label, $this->model->getFillable())? '' : $this->model->$label
-        ], $options)).(empty($label) | (substr($label, 0,
-                1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
+                ' . parent::plainInput(array_merge([
+                'class' => 'validate',
+                'id'    => $this->genId($label),
+                'value' => !method_exists($this->model, $label) && in_array($label, $this->model->getFillable()) ? $this->model->$label : ''], $options)) . (empty($label) | (substr($label, 0,
+                    1) == '_') ? '' : '<label for="' . $this->genId($label) . '">' . $this->inputToRead($label) . '</label>') . '
         </div>
         ';
     }

@@ -107,6 +107,7 @@ class Materialize extends Plain
                 '.parent::plainInput(array_merge([
             'class' => 'validate',
             'id'    => $this->genId($label),
+            'value' => $this->model->$label
         ], $options)).(empty($label) | (substr($label, 0,
                 1) == '_') ? '' : '<label for="'.$this->genId($label).'">'.$this->inputToRead($label).'</label>').'
         </div>

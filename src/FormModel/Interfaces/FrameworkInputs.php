@@ -501,6 +501,7 @@ abstract class FrameworkInputs
                 'name'  => $input,
                 'class' => 'form-control',
                 'id'    => $this->genId($input),
+                'value' => !method_exists($this->model, $input) && in_array($input, $this->model->getFillable())? $this->model->$input:  ''
             ]);
         }
 

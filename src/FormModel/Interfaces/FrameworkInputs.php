@@ -95,7 +95,14 @@ abstract class FrameworkInputs
             if ($hasDefault !== false && $value === $hasDefault) {
                 $attr['selected'] = 'selected';
             }
-            $attr['value'] = $value;
+            if (is_object($text)) {
+                $attr['value'] = $text->value ?: '';
+            } elseif (is_array($text)) {
+                $attr['value'] = $text['value'] ?: '';
+            } else {
+                $attr['value'] = '';
+            }
+
             $return .= '<option'.$this->attributes($attr).'>'.$text."</option>\n";
         }
 
